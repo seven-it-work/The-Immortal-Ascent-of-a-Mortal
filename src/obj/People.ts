@@ -45,10 +45,19 @@ export default class NumberInfo {
     }
 }
 
+export default class 基础点 {
+    blood: number;
+    strength: number;
+    physical: number;
+    attack: number;
+    defense: number;
+    velocity: number;
+}
 
 export default class {
     name: string;
     age: number;
+    基础点: 基础点;
     // 气血
     blood: NumberInfo;
     // 元气
@@ -75,9 +84,9 @@ export default class {
     grade: number;
     // 五行灵根
     spiritualRoots: SpiritualRoots;
-    // 光
+    // 光灵根（五行、光、暗 灵根只能存在一种）
     light: number;
-    // 暗
+    // 暗灵根
     dark: number;
     // 装备、法器
     // 坐骑
