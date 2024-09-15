@@ -1,3 +1,5 @@
+import {b} from "vite/dist/node/types.d-aGj9QkWt";
+
 const levelAndMark = []
 const jj = [
     "练气期",
@@ -55,6 +57,7 @@ export default class 基础点 {
 }
 
 export default class {
+    id: string;
     name: string;
     age: number;
     基础点: 基础点;
@@ -91,6 +94,29 @@ export default class {
     // 装备、法器
     // 坐骑
     // 护具
+
+    public isDead(): boolean {
+        return this.blood.current === 0;
+    }
+
+    public isSleep(): boolean {
+        return this.physical.current <0;
+    }
+
+    public doSleep() {
+        this.physical.current++;
+    }
+
+    /**
+     * 当第一次休眠时
+     */
+    public usePhysical() {
+        if (this.physical.current<=0){
+            this.physical.current-=3
+        }else {
+            this.physical.current--
+        }
+    }
 }
 
 export class SpiritualRoots {
