@@ -1,5 +1,3 @@
-import {b} from "vite/dist/node/types.d-aGj9QkWt";
-
 const levelAndMark = []
 const jj = [
     "练气期",
@@ -38,7 +36,7 @@ for (let i = 0; i < jj2.length; i++) {
 }
 console.log(levelAndMark)
 
-export default class NumberInfo {
+export  class NumberInfo {
     pre: number;
     current: number;
 
@@ -47,7 +45,7 @@ export default class NumberInfo {
     }
 }
 
-export default class 基础点 {
+export  class FoundationPoint {
     blood: number;
     strength: number;
     physical: number;
@@ -60,7 +58,7 @@ export default class {
     id: string;
     name: string;
     age: number;
-    基础点: 基础点;
+    foundationPoint: FoundationPoint;
     // 气血
     blood: NumberInfo;
     // 元气

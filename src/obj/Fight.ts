@@ -1,7 +1,7 @@
 import People from "./People";
-import Chance from "chance"
+import Chance from 'chance'
 
-export default class RoundFunction {
+export class RoundFunction {
     private readonly startRound: number;
     private readonly endRound: number;
     private readonly maximumNumberOfExecutions: number;
@@ -91,7 +91,7 @@ export default class Fight {
     private autoFight() {
         // 获取idAndPeopleMap.values()按着速度进行排序
         Array.from(this.idAndPeopleMap.values()).sort((v1, v2) => {
-            return v1.velocity - v2.velocity;
+            return v1.velocity.current - v2.velocity.current;
         }).forEach(item => {
             if (item.isDead()) {
                 // 死亡了的从队伍中移除
@@ -126,11 +126,11 @@ export default class Fight {
 
     private static peopleFight(attack: People, defend: People, fight: Fight) {
         // 判断是使用技能还是普通攻击。后续可以做一个比例 按比例来随机触发 todo
-        Fight.技能攻击(attack, defend, fight);
-        Fight.普通攻击(attack, defend, fight);
+        Fight.skillAttack(attack, defend, fight);
+        Fight.normalAttack(attack, defend, fight);
     }
 
-    private static 普通攻击(attack: People, defend: People, fight: Fight) {
+    private static normalAttack(attack: People, defend: People, fight: Fight) {
         // 普通攻击
         attack.usePhysical();
         // 普通攻击伤害=攻击力+装备攻击力加成 todo
@@ -145,7 +145,7 @@ export default class Fight {
         defend.blood.current -= harm
     }
 
-    private static 技能攻击(attack: People, defend: People, fight: Fight) {
+    private static skillAttack(attack: People, defend: People, fight: Fight) {
         // 过滤出可以执行的技能 消耗元气<attack的元气 todo
         // 如果一个技能都没有，执行普通攻击兜底。否则随机选择一个技能进行执行 todo
 
