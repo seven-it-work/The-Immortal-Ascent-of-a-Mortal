@@ -36,7 +36,13 @@ for (let i = 0; i < jj2.length; i++) {
 }
 console.log(levelAndMark)
 
-export  class NumberInfo {
+export class Skill{
+    name:string;
+    strength:number;
+
+}
+
+export class NumberInfo {
     pre: number;
     current: number;
 
@@ -45,7 +51,7 @@ export  class NumberInfo {
     }
 }
 
-export  class FoundationPoint {
+export class FoundationPoint {
     blood: number;
     strength: number;
     physical: number;
@@ -89,16 +95,31 @@ export default class {
     light: number;
     // 暗灵根
     dark: number;
+    // 闪避率
+    dodge: number;
+    // 暴击率
+    crit: number;
+    // 暴击加成
+    critBonus: number;
+    // 格挡率
+    block: number;
+    // 命中率
+    hit: number;
+    // 抗性
+    resistance: number;
     // 装备、法器
     // 坐骑
     // 护具
+
+    // 装备的技能
+    skills: Skill[];
 
     public isDead(): boolean {
         return this.blood.current === 0;
     }
 
     public isSleep(): boolean {
-        return this.physical.current <0;
+        return this.physical.current < 0;
     }
 
     public doSleep() {
@@ -109,9 +130,9 @@ export default class {
      * 当第一次休眠时
      */
     public usePhysical() {
-        if (this.physical.current<=0){
-            this.physical.current-=3
-        }else {
+        if (this.physical.current <= 0) {
+            this.physical.current -= 3
+        } else {
             this.physical.current--
         }
     }

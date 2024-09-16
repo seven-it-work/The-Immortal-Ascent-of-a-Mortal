@@ -1,5 +1,5 @@
 import People from "./People";
-import Chance from 'chance'
+import {randomProbability, randomUtil} from "../util/ProbabilityUtils.ts";
 
 export class RoundFunction {
     private readonly startRound: number;
@@ -115,8 +115,11 @@ export default class Fight {
                         // 没有对手了，应该是结束了
                     } else {
                         // 从中选一个
-                        const pickone = new Chance().pickone(targetIdList);
-                        Fight.peopleFight(item, pickone, this)
+                        const pickOneId = randomUtil.pickone(targetIdList);
+                        const defend = this.idAndPeopleMap.get(pickOneId);
+                        if (defend) {
+                            Fight.peopleFight(item, defend, this)
+                        }
                     }
                 }
 
@@ -134,21 +137,32 @@ export default class Fight {
         // 普通攻击
         attack.usePhysical();
         // 普通攻击伤害=攻击力+装备攻击力加成 todo
-        let harm = attack.attack.current
-        // 暴击判定 todo
-
-        // 防御闪避判定 todo
-
-        // 防御格挡判定 todo
-
+        let harm = Math.max(attack.attack.current - defend.defense.current, 1)
+        // 暴击判定
+        if (randomProbability(attack.crit)) {
+            harm = (1 + attack.critBonus / 100) * harm
+        }
+        // 防御闪避判定
+        if (randomProbability(Math.max(attack.hit - defend.dodge, 1))) {
+            harm = 0;
+        }
+        // 防御格挡判定
+        if (randomProbability(defend.block)) {
+            harm = harm * (1 - defend.resistance / (defend.resistance + attack.resistance))
+        }
         // 伤害赋值
         defend.blood.current -= harm
     }
 
     private static skillAttack(attack: People, defend: People, fight: Fight) {
-        // 过滤出可以执行的技能 消耗元气<attack的元气 todo
-        // 如果一个技能都没有，执行普通攻击兜底。否则随机选择一个技能进行执行 todo
-
-
+        // 过滤出可以执行的技能 消耗元气<attack的元气
+        const skills = attack.skills.filter(item => item.strength <= attack.strength.current);
+        // 如果一个技能都没有，执行普通攻击兜底。否则随机选择一个技能进行执行
+        if (skills.length === 0) {
+            Fight.normalAttack(attack, defend, fight);
+        } else {
+            const skill = randomUtil.pickone(skills);
+            // todo 执行技能
+        }
     }
 }

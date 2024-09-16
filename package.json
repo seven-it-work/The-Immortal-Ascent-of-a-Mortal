@@ -9,7 +9,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "chance": "^1.1.12",
+    "@types/chance": "^1.1.6",
+    "faker": "^6.6.6",
+    "lodash": "^4.17.21",
     "vue": "^3.4.37"
   },
   "devDependencies": {
