@@ -91,7 +91,7 @@ export default class Fight {
     private autoFight() {
         // 获取idAndPeopleMap.values()按着速度进行排序
         Array.from(this.idAndPeopleMap.values()).sort((v1, v2) => {
-            return v1.velocity.current - v2.velocity.current;
+            return v1.velocity - v2.velocity;
         }).forEach(item => {
             if (item.isDead()) {
                 // 死亡了的从队伍中移除
@@ -137,7 +137,7 @@ export default class Fight {
         // 普通攻击
         attack.usePhysical();
         // 普通攻击伤害=攻击力+装备攻击力加成 todo
-        let harm = Math.max(attack.attack.current - defend.defense.current, 1)
+        let harm = Math.max(attack.attack - defend.defense, 1)
         // 暴击判定
         if (randomProbability(attack.crit)) {
             harm = (1 + attack.critBonus / 100) * harm
@@ -151,12 +151,12 @@ export default class Fight {
             harm = harm * (1 - defend.resistance / (defend.resistance + attack.resistance))
         }
         // 伤害赋值
-        defend.blood.current -= harm
+        defend.life.current -= harm
     }
 
     private static skillAttack(attack: People, defend: People, fight: Fight) {
         // 过滤出可以执行的技能 消耗元气<attack的元气
-        const skills = attack.skills.filter(item => item.strength <= attack.strength.current);
+        const skills = attack.skills.filter(item => item.mana <= attack.mana.current);
         // 如果一个技能都没有，执行普通攻击兜底。否则随机选择一个技能进行执行
         if (skills.length === 0) {
             Fight.normalAttack(attack, defend, fight);

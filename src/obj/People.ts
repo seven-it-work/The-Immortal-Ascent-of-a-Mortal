@@ -1,3 +1,5 @@
+import {randomUtil, uuid} from "../util/ProbabilityUtils.ts";
+
 const levelAndMark = []
 const jj = [
     "练气期",
@@ -36,86 +38,86 @@ for (let i = 0; i < jj2.length; i++) {
 }
 console.log(levelAndMark)
 
-export class Skill{
-    name:string;
-    strength:number;
+export class Skill {
+    name: string;
+    mana: number;
 
 }
 
-export class NumberInfo {
-    pre: number;
-    current: number;
+/**
+ * 最大值和自身等级有关
+ */
+export class ScopeNumberInfo {
+    current: number = 1;
+    basePoint: number = 0;
+    basePointMultiplier: number = 1;
+    grow: number = 0;
 
-    getMax(baseValue: number, growthRate: number = 0): number {
-        return this.pre + (baseValue + this.pre * growthRate)
+    /**
+     * 最大值=(1 + level * 成长因子) * (基础点 * 基础点倍率)
+     * @param level
+     */
+    getMax(level: number): number {
+        return (1 + level * this.grow) * (this.basePoint * this.basePointMultiplier)
+    }
+
+    constructor(current: number = 1) {
+        this.current = current;
     }
 }
 
-export class FoundationPoint {
-    blood: number;
-    strength: number;
-    physical: number;
-    attack: number;
-    defense: number;
-    velocity: number;
-}
-
 export default class {
-    id: string;
+    id: string = uuid();
+    // 姓名
     name: string;
-    age: number;
-    foundationPoint: FoundationPoint;
-    // 气血
-    blood: NumberInfo;
-    // 元气
-    strength: NumberInfo;
-    // 体力
-    physical: NumberInfo;
-    // 灵力(升级所需)
-    spiritualPower: NumberInfo;
-    // 攻击
-    attack: NumberInfo;
-    // 防御
-    defense: NumberInfo;
-    // 速度
-    velocity: NumberInfo;
-    // 幸运
-    fortunate: number;
-    // 威望
-    prestige: number;
-    // 魅力
-    charm: number;
-    // 善恶
-    goodAndEvil: number;
+    // 出生时间
+    birth: number;
     // 等级
-    grade: number;
-    // 五行灵根
-    spiritualRoots: SpiritualRoots;
-    // 光灵根（五行、光、暗 灵根只能存在一种）
-    light: number;
-    // 暗灵根
-    dark: number;
-    // 闪避率
-    dodge: number;
-    // 暴击率
-    crit: number;
-    // 暴击加成
-    critBonus: number;
-    // 格挡率
-    block: number;
-    // 命中率
-    hit: number;
-    // 抗性
-    resistance: number;
-    // 装备、法器
-    // 坐骑
-    // 护具
+    level: number;
+    // 生命值
+    life: ScopeNumberInfo = new ScopeNumberInfo(20);
+    // 法力
+    mana: ScopeNumberInfo = new ScopeNumberInfo(10);
+    // 灵力（升级必须要的）
+    spiritualPower: ScopeNumberInfo = new ScopeNumberInfo(0);
+    // 体力（做任何操作都需要体力，战斗中体力=0需要休眠）
+    physical: ScopeNumberInfo = new ScopeNumberInfo(10);
+    // 速度
+    velocity: number = 1;
+    // 攻击力
+    attack: number = 1;
+    // 防御力
+    defense: number = 1;
+    // 暴击率（触发暴击的概率，按百分率取值的 比如100=100%）
+    crit: number = 0;
+    // 暴击加成（按百分率取值的）
+    critBonus: number = 0;
+    // 命中率（按百分率取值的）
+    hit: number = 0;
+    // 躲避率（按百分率取值的）
+    dodge: number = 0;
+    // 格挡率（按百分率取值的）
+    block: number = 0;
+    // 抗性（抗性越高，格挡减少伤害越多）
+    resistance: number = 0;
+    // 技能
+    skills: Skill[] = [];
 
-    // 装备的技能
-    skills: Skill[];
+    // 年纪
+    getAge(now: number): number {
+        return now - this.birth;
+    }
+
+    getMax(key: "life" | "mana" | "spiritualPower" | "physical"): number {
+        const levelNumberInfo = this[key];
+        if (levelNumberInfo) {
+            return levelNumberInfo.getMax(this.level);
+        }
+        return 0;
+    }
 
     public isDead(): boolean {
-        return this.blood.current === 0;
+        return this.life.current === 0;
     }
 
     public isSleep(): boolean {
@@ -136,17 +138,36 @@ export default class {
             this.physical.current--
         }
     }
+
+
+    constructor(name: string,
+                birth: number,
+                id: string = uuid(),
+                level: number = 1,
+                life: ScopeNumberInfo = new ScopeNumberInfo(20),
+                mana: ScopeNumberInfo = new ScopeNumberInfo(10),
+                spiritualPower: ScopeNumberInfo = new ScopeNumberInfo(0),
+                physical: ScopeNumberInfo = new ScopeNumberInfo(10)) {
+        this.id = id;
+        this.name = name;
+        this.birth = birth;
+        this.level = level;
+        this.life = life;
+        this.mana = mana;
+        this.spiritualPower = spiritualPower;
+        this.physical = physical;
+    }
 }
 
 export class SpiritualRoots {
     // 金
-    gold: number;
+    gold: number = 0;
     // 木
-    wood: number;
+    wood: number = 0;
     // 水
-    water: number;
+    water: number = 0;
     // 火
-    fire: number;
+    fire: number = 0;
     // 土
-    earth: number;
+    earth: number = 0;
 }

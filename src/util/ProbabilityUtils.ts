@@ -3,6 +3,10 @@ import Chance from 'chance'
 export const randomUtil = new Chance()
 
 
+export const uuid = () => randomUtil.guid()
+
+console.log(uuid())
+
 /**
  * 概率工具
  * @param num 越大概率越大
