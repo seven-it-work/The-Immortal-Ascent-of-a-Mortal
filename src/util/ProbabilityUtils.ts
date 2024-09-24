@@ -5,7 +5,6 @@ export const randomUtil = new Chance()
 
 export const uuid = () => randomUtil.guid()
 
-console.log(uuid())
 
 /**
  * 概率工具
@@ -18,4 +17,11 @@ export const randomProbability = (num: number, max: number = 100): boolean => {
     }
     const integer = randomUtil.integer({min: 0, max});
     return num >= integer;
+}
+
+export const getPercent = (fenZi: number | undefined, fenMu: number | undefined, numberSize: number = 1): number => {
+    if (!fenZi || !fenMu) {
+        return 0;
+    }
+    return Number.parseInt((fenZi / fenMu * 100).toFixed(numberSize))
 }

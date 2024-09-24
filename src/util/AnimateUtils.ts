@@ -1,6 +1,6 @@
 // 动画库
 // 几倍速
-const magnification = 1;
+export let magnification = 2;
 
 export const beAttacked = (node: HTMLElement | undefined | null): Promise<any> => {
     return animateCSS(node, 'shakeX')

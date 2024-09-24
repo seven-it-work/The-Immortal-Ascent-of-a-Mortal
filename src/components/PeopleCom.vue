@@ -1,39 +1,49 @@
 <script lang="ts">
-import {defineComponent} from 'vue'
+import {defineComponent, PropType} from 'vue'
 import {beAttacked, doAttacked} from "../util/AnimateUtils.ts";
+import {ImmortalCultivators} from "../objs/ImmortalCultivators.ts";
+import {getPercent} from "../util/ProbabilityUtils.ts";
 
 export default defineComponent({
   name: "PeopleCom",
-  methods:{},
+  methods: {getPercent},
   created() {
-      // setInterval(()=>{
-    doAttacked(document.getElementById("123")).then(()=>{
-          console.log("执行完了")
-        })
-      // },6000)
+    // setInterval(()=>{
+    // doAttacked(document.getElementById("123")).then(() => {
+    //   console.log("执行完了")
+    // })
+    // },6000)
   },
+  props: {
+    immortalCultivator: {
+      required: true,
+      type: Object as PropType<ImmortalCultivators>
+    }
+  }
 })
 </script>
 
 <template>
-  <a-card :bordered="true" style="width: 200px" class="people-com" id="123">
+  <a-card :bordered="true" style="width: 200px" class="people-com" :id="`card_animate_${immortalCultivator.id}`">
     <template #title>
       <a-row>
         <a-col :span="8">
-          <a-avatar :size="40">USER</a-avatar>
+          <a-avatar :size="40">{{ immortalCultivator?.name?.substr(0, 1) }}</a-avatar>
         </a-col>
         <a-col :span="16">
-          <div>名称：xxx</div>
-          <div>境界：练气期</div>
+          <div>名称：{{ immortalCultivator.name }}</div>
+          <div>境界：{{ immortalCultivator.getLevelStr() }}</div>
+          <!--          <div>等级：{{ immortalCultivator.level }}</div>-->
         </a-col>
       </a-row>
     </template>
     <div>
       <div class="progress-container">
         <span>生命：</span>
+                <span>{{immortalCultivator.currentLife}}/{{immortalCultivator.life}}</span>
         <a-progress
             :stroke-color="{from: '#108ee9',to: '#87d068',}"
-            :percent="99.9"
+            :percent="getPercent(immortalCultivator.currentLife,immortalCultivator.life)"
             status="active"
             :size="[300, 20]"
         />
@@ -42,19 +52,13 @@ export default defineComponent({
         <span>法力：</span>
         <a-progress
             :stroke-color="{from: '#108ee9',to: '#87d068',}"
-            :percent="99.9"
+            :percent="getPercent(immortalCultivator.currentMana,immortalCultivator.mana)"
             status="active"
             :size="[300, 20]"
         />
       </div>
       <div class="progress-container">
-        <span>攻击：</span>
-        <a-progress
-            :stroke-color="{from: '#108ee9',to: '#87d068',}"
-            :percent="99.9"
-            status="active"
-            :size="[300, 20]"
-        />
+        <span>攻击：{{immortalCultivator.attack}}</span>
       </div>
     </div>
   </a-card>

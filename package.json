@@ -14,7 +14,9 @@
     "ant-design-vue": "^4.2.5",
     "faker": "^6.6.6",
     "lodash": "^4.17.21",
-    "vue": "^3.4.37"
+    "pinia": "^2.2.2",
+    "vue": "^3.4.37",
+    "vuex": "^4.0.2"
   },
   "devDependencies": {
     "@types/lodash": "^4.17.7",
