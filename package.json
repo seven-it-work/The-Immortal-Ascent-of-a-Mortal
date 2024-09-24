@@ -10,6 +10,8 @@
   },
   "dependencies": {
     "@types/chance": "^1.1.6",
+    "animate.css": "^4.1.1",
+    "ant-design-vue": "^4.2.5",
     "faker": "^6.6.6",
     "lodash": "^4.17.21",
     "vue": "^3.4.37"
