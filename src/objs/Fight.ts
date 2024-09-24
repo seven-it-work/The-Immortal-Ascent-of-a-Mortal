@@ -11,6 +11,7 @@ export class Fight {
     isAutoNextRound: boolean = true;
     //     场景对象
     fightNode: FightNode;
+    isFighting: boolean = false;
 
 
     constructor(player: Player, round: number, isAutoNextRound: boolean, fightNode: FightNode) {

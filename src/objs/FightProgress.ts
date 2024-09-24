@@ -3,7 +3,7 @@ import {ImmortalCultivators} from "./ImmortalCultivators.ts";
 export interface FightProgressInterFace {
     id?: string|undefined;
     // 小兵、boss、宝箱等
-    c?: string | undefined;
+    type?: string | undefined;
     currentEnemy?: ImmortalCultivators[] | undefined;
     // 宝箱对象
 

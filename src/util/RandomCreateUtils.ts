@@ -65,7 +65,7 @@ export const immortalCreate = (immortalCultivatorsInterface: ImmortalCultivators
         immortalCultivatorsInterface.mana = randomUtil.integer({min: 0, max: 100})
     }
     if (!immortalCultivatorsInterface.attack) {
-        immortalCultivatorsInterface.attack = randomUtil.integer({min: 0, max: 100})
+        immortalCultivatorsInterface.attack = randomUtil.integer({min: 0, max: 50})
     }
     immortalCultivatorsInterface.currentLife = immortalCultivatorsInterface.life
     immortalCultivatorsInterface.currentMana = immortalCultivatorsInterface.mana

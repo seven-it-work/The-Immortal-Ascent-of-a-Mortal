@@ -10,6 +10,7 @@ const immortalCultivators = immortalCreate();
 immortalCultivators.name = "会飞的🐖"
 immortalCultivators.life = 500
 immortalCultivators.currentLife = 500
+immortalCultivators.attack=100
 const player = new Player(immortalCultivators, []);
 const fight = new Fight(player, 0, true, fightNodeCreate());
 
