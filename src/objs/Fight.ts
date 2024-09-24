@@ -8,7 +8,7 @@ export class Fight {
     // 回合
     round: number=0;
     //     是否自动下一回合
-    isAutoNextRound: boolean = true;
+    isAutoNextRound: boolean = false;
     //     场景对象
     fightNode: FightNode;
     isFighting: boolean = false;

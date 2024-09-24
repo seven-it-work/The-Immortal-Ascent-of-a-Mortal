@@ -7,9 +7,10 @@ import {beAttacked, doAttacked} from "../util/AnimateUtils.ts";
 import {getPercent, randomUtil} from "../util/ProbabilityUtils.ts";
 import {ImmortalCultivators} from "../objs/ImmortalCultivators.ts";
 import {message, Modal} from 'ant-design-vue';
-
+import {useLogStore} from "../store/useLogStore.ts";
 
 const fightStore = useFightStore()
+const logStore = useLogStore()
 const fight: Fight = fightStore.fight;
 
 // 战斗执行
@@ -63,6 +64,7 @@ async function doFight(): Promise<string> {
 }
 
 async function fightFunction(attacker: ImmortalCultivators, defencer: ImmortalCultivators) {
+  logStore.logAttack(attacker, defencer)
   // 播放动画
   await doAttacked(document.getElementById(`card_animate_${attacker.id}`))
   // 血量计算
@@ -76,6 +78,7 @@ async function startFight() {
   if (fight.fightNode.currentProgressIndex > (fight.fightNode.fightProgressList?.length || 0) - 1) {
     fight.isFighting = false
     // 结束了 弹窗告知
+    // todo 加入日志
     Modal.success({
       title: '战斗信息',
       content: '战斗完成了',
@@ -86,6 +89,7 @@ async function startFight() {
   // 重置回合
   fight.round = 0;
   if (type === '胜利了') {
+    // todo 加入日志
     message.success('胜利！')
     if (fight.isAutoNextRound) {
       fight.fightNode.currentProgressIndex++;
@@ -95,6 +99,7 @@ async function startFight() {
       // 手动点击按钮
     }
   } else if (type === '失败了') {
+    // todo 加入日志
     // 弹窗告知
     Modal.error({
       title: '战斗信息',
@@ -104,9 +109,6 @@ async function startFight() {
   fight.isFighting = false
 }
 
-setTimeout(async () => {
-  startFight()
-}, 1000)
 
 function changeAutoNext() {
   if (fight.isAutoNextRound && !fight.isFighting) {
@@ -151,17 +153,21 @@ function clickStartFight() {
         {{ item.type }}
       </a-card>
     </a-flex>
-    <a-progress :percent="getPercent(fight.fightNode.currentProgressIndex,fight.fightNode.fightProgressList?.length)" :size="[800, 20]"/>
+    <a-progress :percent="getPercent(fight.fightNode.currentProgressIndex,fight.fightNode.fightProgressList?.length)"
+                :size="[800, 20]"/>
   </a-row>
   <a-row justify="space-between" align="center" style="margin: 20px">
     <a-col :span="10">
+<!--      日志 todo 自动往下滚动-->
       <div style="border:1px solid #40a9ff;border-radius: 6px;height: 400px">
+        <div v-for="item in logStore.logs" :key="item" v-html="item"></div>
       </div>
     </a-col>
     <a-col>
       <a-divider type="vertical" style="height: 400px; background-color: #7cb305"/>
     </a-col>
     <a-col :span="13">
+<!--      个人信息-->
       <div style="border:1px solid #40a9ff;border-radius: 6px;height: 400px">
         <a-row>
           <a-col flex="none">

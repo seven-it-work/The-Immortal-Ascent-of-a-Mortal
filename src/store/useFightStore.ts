@@ -7,7 +7,7 @@ interface State {
 }
 
 // 创建 store
-export const useFightStore = defineStore('main', {
+export const useFightStore = defineStore('fight', {
     state: (): State => ({}),
     actions: {
         init(fight: Fight) {

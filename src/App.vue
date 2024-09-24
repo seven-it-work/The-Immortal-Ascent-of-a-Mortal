@@ -12,7 +12,7 @@ immortalCultivators.life = 500
 immortalCultivators.currentLife = 500
 immortalCultivators.attack=100
 const player = new Player(immortalCultivators, []);
-const fight = new Fight(player, 0, true, fightNodeCreate());
+const fight = new Fight(player, 0, false, fightNodeCreate());
 
 useFightStore().init(fight)
 </script>
