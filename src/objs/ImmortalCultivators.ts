@@ -50,6 +50,8 @@ export interface ImmortalCultivatorsInterface {
     strength?: number | undefined;
     // 使用过的点数
     usedPoints?: number;
+    // 当前灵力
+    currentLinLi?: number;
 }
 
 export class ImmortalCultivators implements ImmortalCultivatorsInterface {
@@ -63,6 +65,7 @@ export class ImmortalCultivators implements ImmortalCultivatorsInterface {
     currentLife: number = 0;
     currentMana: number = 0;
     usedPoints: number = 0;
+    currentLinLi: number = 0;
 
     getAttack(): number {
         return this.strength || 0;
@@ -91,5 +94,21 @@ export class ImmortalCultivators implements ImmortalCultivatorsInterface {
 
     isLife(): boolean {
         return (this?.currentLife || 0) > 0;
+    }
+
+    canUpdateLevel(): boolean {
+        return this.currentLinLi > this.getUpdateLinLi();
+    }
+
+    getUpdateLinLi(): number {
+        const baseNumber = this.level + 1
+        return Math.ceil(baseNumber * baseNumber * 0.1 + baseNumber)
+    }
+
+    doUpdateLevel() {
+        if (this.canUpdateLevel()) {
+            this.level++;
+            this.currentLinLi = 0;
+        }
     }
 }

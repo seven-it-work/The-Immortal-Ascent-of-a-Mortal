@@ -8,6 +8,7 @@ import {getPercent, randomUtil} from "../util/ProbabilityUtils.ts";
 import {ImmortalCultivators} from "../objs/ImmortalCultivators.ts";
 import {message, Modal} from 'ant-design-vue';
 import {useLogStore} from "../store/useLogStore.ts";
+import {sleep} from "../util/RandomCreateUtils.ts";
 
 const fightStore = useFightStore()
 const logStore = useLogStore()
@@ -15,52 +16,59 @@ const fight: Fight = fightStore.fight;
 
 // 战斗执行
 async function doFight(): Promise<string> {
-  // todo 先手问题，这里默认 player先手
-  let round2 = 0;
-  let isPlayer = true;
+  const currentFightProgress = fight.fightNode.getCurrentFightProgress();
+  if (['小兵'].includes(currentFightProgress.type)) {
+    // todo 先手问题，这里默认 player先手
+    let round2 = 0;
+    let isPlayer = true;
 
-  let playerFightIndex = 0;
-  let enemyFightIndex = 0;
-  const fightList = fight.player.getFightList();
-  const currentEnemy = (fight.fightNode.getCurrentFightProgress()?.currentEnemy || [])
-
-  while (true) {
-    const sPlayer = fightList.filter(item => item.isLife());
-    const sEnemy = currentEnemy.filter(item => item.isLife());
-    if (sPlayer.length == 0) {
-      // 战斗结束，失败了
-      return "失败了"
-    }
-    if (sEnemy.length == 0) {
-      // 战斗结束，胜利
-      return "胜利了"
-    }
-    if (isPlayer) {
-      const attack = fightList[playerFightIndex];
-      if (attack.isLife()) {
-        // 敌人随机选则一个
-        const immortalCultivator = randomUtil.pickone(sEnemy);
-        await fightFunction(attack, immortalCultivator);
-        isPlayer = false
+    let playerFightIndex = 0;
+    let enemyFightIndex = 0;
+    const fightList = fight.player.getFightList();
+    const currentEnemy = (currentFightProgress?.currentEnemy || [])
+    while (true) {
+      const sPlayer = fightList.filter(item => item.isLife());
+      const sEnemy = currentEnemy.filter(item => item.isLife());
+      if (sPlayer.length == 0) {
+        // 战斗结束，失败了
+        return "失败了"
       }
-      playerFightIndex++;
-      playerFightIndex = playerFightIndex % fightList.length;
-    } else {
-      const attack = currentEnemy[enemyFightIndex];
-      if (attack.isLife()) {
-        // 敌人随机选则一个
-        const immortalCultivator = randomUtil.pickone(sPlayer);
-        await fightFunction(attack, immortalCultivator);
-        isPlayer = true
+      if (sEnemy.length == 0) {
+        // 战斗结束，胜利
+        return "胜利了"
       }
-      enemyFightIndex++;
-      enemyFightIndex = enemyFightIndex % currentEnemy.length;
+      if (isPlayer) {
+        const attack = fightList[playerFightIndex];
+        if (attack.isLife()) {
+          // 敌人随机选则一个
+          const immortalCultivator = randomUtil.pickone(sEnemy);
+          await fightFunction(attack, immortalCultivator);
+          isPlayer = false
+        }
+        playerFightIndex++;
+        playerFightIndex = playerFightIndex % fightList.length;
+      } else {
+        const attack = currentEnemy[enemyFightIndex];
+        if (attack.isLife()) {
+          // 敌人随机选则一个
+          const immortalCultivator = randomUtil.pickone(sPlayer);
+          await fightFunction(attack, immortalCultivator);
+          isPlayer = true
+        }
+        enemyFightIndex++;
+        enemyFightIndex = enemyFightIndex % currentEnemy.length;
+      }
+      round2++;
+      if (round2 % 2 == 0) {
+        fight.round = round2 / 2;
+      }
     }
-    round2++;
-    if (round2 % 2 == 0) {
-      fight.round = round2 / 2;
-    }
+  } else if (['灵力'].includes(currentFightProgress.type)) {
+    // todo 这里是谁吸收呢？是玩家？随机一个？还是随机分配？
+    randomUtil.pickone(fight.player.getFightList()).currentLinLi += currentFightProgress.linLi;
+    return Promise.resolve("吸收灵力");
   }
+  return Promise.resolve("还在开发中...");
 }
 
 async function fightFunction(attacker: ImmortalCultivators, defencer: ImmortalCultivators) {
@@ -89,9 +97,9 @@ async function startFight() {
   const type = await doFight();
   // 重置回合
   fight.round = 0;
-  if (type === '胜利了') {
+  if (['胜利了', '吸收灵力'].includes(type)) {
     // todo 加入日志
-    message.success('胜利！')
+    message.success(type)
     if (fight.isAutoNextRound) {
       fight.fightNode.currentProgressIndex++;
       // 继续运行
@@ -107,6 +115,7 @@ async function startFight() {
       content: '失败了',
     })
   }
+  await sleep(1000)
   fight.isFighting = false
 }
 

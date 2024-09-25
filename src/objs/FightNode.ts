@@ -11,20 +11,19 @@ export interface FightNodeInterface {
 export class FightNode implements FightNodeInterface {
     id: string | undefined;
     // 进度
-    fightProgressList: FightProgress[] | undefined;
+    fightProgressList: FightProgress[] = [];
     // 当前进度索引;
     currentProgressIndex: number = 0;
 
 
     constructor(fightNodeInterface: FightNodeInterface) {
-        this.id = fightNodeInterface.id;
-        this.fightProgressList = fightNodeInterface.fightProgressList;
+        Object.assign(this, fightNodeInterface);
         this.currentProgressIndex = fightNodeInterface.currentProgressIndex || 0;
     }
 
-    getCurrentFightProgress(): FightProgress | undefined {
+    getCurrentFightProgress(): FightProgress {
         if (!this.fightProgressList) {
-            return undefined;
+            throw new Error("fightProgressList does not exist");
         }
         return this.fightProgressList[this.currentProgressIndex]
     }

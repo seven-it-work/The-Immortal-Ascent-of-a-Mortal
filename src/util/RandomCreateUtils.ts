@@ -24,13 +24,13 @@ export const fightNodeCreate = (fightNodeInterface: FightNodeInterface = {}): Fi
     return new FightNode(fightNodeInterface);
 }
 
-export const fightProgressCreate = (fightProgressInterFace: FightProgressInterFace = {}): FightProgress => {
+export const fightProgressCreate = (fightProgressInterFace: FightProgressInterFace = {}, level: number = 1): FightProgress => {
     if (!fightProgressInterFace.id) {
         fightProgressInterFace.id = uuid()
     }
 
     if (!fightProgressInterFace.type) {
-        fightProgressInterFace.type = "小兵"
+        fightProgressInterFace.type = randomUtil.pickone(["小兵", "灵力"]);
     }
     if (["小兵"].includes(fightProgressInterFace.type)) {
         if (!fightProgressInterFace.currentEnemy) {
@@ -38,9 +38,11 @@ export const fightProgressCreate = (fightProgressInterFace: FightProgressInterFa
             // 初始化数量
             const integer = randomUtil.integer({min: 1, max: 3});
             for (let i = 0; i < integer; i++) {
-                fightProgressInterFace.currentEnemy.push(immortalCreate())
+                fightProgressInterFace.currentEnemy.push(immortalCreate({level}))
             }
         }
+    } else if (["灵力"].includes(fightProgressInterFace.type)) {
+        fightProgressInterFace.linLi = randomUtil.integer({min: 1, max: Math.max(level, 1)});
     }
     return new FightProgress(fightProgressInterFace)
 }
