@@ -40,39 +40,53 @@ export interface ImmortalCultivatorsInterface {
     name?: string | undefined;
     birth?: number | undefined;
     level?: number | undefined;
-    life?: number | undefined;
     currentLife?: number | undefined;
-    mana?: number | undefined;
     currentMana?: number | undefined;
-    attack?: number | undefined;
+    // 体质
+    physique?: number | undefined;
+    // 魂力
+    soulForce?: number | undefined;
+    // 力量
+    strength?: number | undefined;
+    // 使用过的点数
+    usedPoints?: number;
 }
 
 export class ImmortalCultivators implements ImmortalCultivatorsInterface {
-    attack: number | undefined;
-    birth: number | undefined;
-    currentLife: number | undefined;
-    currentMana: number | undefined;
-    id: string | undefined;
-    level: number | undefined;
-    life: number | undefined;
-    mana: number | undefined;
-    name: string | undefined;
+    birth: number = 0;
+    id: string = "";
+    level: number = 0;
+    name: string = "";
+    strength: number = 1;
+    soulForce: number = 1;
+    physique: number = 1;
+    currentLife: number = 0;
+    currentMana: number = 0;
+    usedPoints: number = 0;
+
+    getAttack(): number {
+        return this.strength || 0;
+    }
+
+    getMana(): number {
+        return this.soulForce || 0;
+    }
+
+    getLife(): number {
+        return this.physique || 0;
+    }
 
 
     getLevelStr(): string {
         return temp[this.level || 0]
     }
 
+    getMaxRemainingPoints(): number {
+        return ((this.level || 0) + 1) * 10
+    }
+
     constructor(immortalCultivatorsInterface: ImmortalCultivatorsInterface) {
-        this.attack = immortalCultivatorsInterface.attack;
-        this.birth = immortalCultivatorsInterface.birth;
-        this.currentLife = immortalCultivatorsInterface.currentLife;
-        this.currentMana = immortalCultivatorsInterface.currentMana;
-        this.id = immortalCultivatorsInterface.id;
-        this.level = immortalCultivatorsInterface.level;
-        this.life = immortalCultivatorsInterface.life;
-        this.mana = immortalCultivatorsInterface.mana;
-        this.name = immortalCultivatorsInterface.name;
+        Object.assign(this, immortalCultivatorsInterface)
     }
 
     isLife(): boolean {

@@ -6,11 +6,8 @@ import {Fight} from "./objs/Fight.ts";
 import {useFightStore} from "./store/useFightStore.ts";
 
 // 初始化player
-const immortalCultivators = immortalCreate();
+const immortalCultivators = immortalCreate({level: 1, physique: 50});
 immortalCultivators.name = "会飞的🐖"
-immortalCultivators.life = 500
-immortalCultivators.currentLife = 500
-immortalCultivators.attack=100
 const player = new Player(immortalCultivators, []);
 const fight = new Fight(player, 0, false, fightNodeCreate());
 

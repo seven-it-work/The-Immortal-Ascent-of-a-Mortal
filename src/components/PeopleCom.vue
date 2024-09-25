@@ -1,6 +1,5 @@
 <script lang="ts">
 import {defineComponent, PropType} from 'vue'
-import {beAttacked, doAttacked} from "../util/AnimateUtils.ts";
 import {ImmortalCultivators} from "../objs/ImmortalCultivators.ts";
 import {getPercent} from "../util/ProbabilityUtils.ts";
 
@@ -8,11 +7,6 @@ export default defineComponent({
   name: "PeopleCom",
   methods: {getPercent},
   created() {
-    // setInterval(()=>{
-    // doAttacked(document.getElementById("123")).then(() => {
-    //   console.log("执行完了")
-    // })
-    // },6000)
   },
   props: {
     immortalCultivator: {
@@ -40,10 +34,10 @@ export default defineComponent({
     <div>
       <div class="progress-container">
         <span>生命：</span>
-                <span>{{immortalCultivator.currentLife}}/{{immortalCultivator.life}}</span>
+                <span>{{immortalCultivator.currentLife}}/{{immortalCultivator.getLife()}}</span>
         <a-progress
             :stroke-color="{from: '#108ee9',to: '#87d068',}"
-            :percent="getPercent(immortalCultivator.currentLife,immortalCultivator.life)"
+            :percent="getPercent(immortalCultivator.currentLife,immortalCultivator.getLife())"
             status="active"
             :size="[300, 20]"
         />
@@ -52,13 +46,13 @@ export default defineComponent({
         <span>法力：</span>
         <a-progress
             :stroke-color="{from: '#108ee9',to: '#87d068',}"
-            :percent="getPercent(immortalCultivator.currentMana,immortalCultivator.mana)"
+            :percent="getPercent(immortalCultivator.currentMana,immortalCultivator.getMana())"
             status="active"
             :size="[300, 20]"
         />
       </div>
       <div class="progress-container">
-        <span>攻击：{{immortalCultivator.attack}}</span>
+        <span>攻击：{{immortalCultivator.getAttack()}}</span>
       </div>
     </div>
   </a-card>

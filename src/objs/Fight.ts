@@ -12,6 +12,8 @@ export class Fight {
     //     场景对象
     fightNode: FightNode;
     isFighting: boolean = false;
+    // 第一次开始标记
+    isStart: boolean = false;
 
 
     constructor(player: Player, round: number, isAutoNextRound: boolean, fightNode: FightNode) {

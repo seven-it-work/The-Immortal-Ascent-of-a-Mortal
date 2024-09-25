@@ -68,12 +68,13 @@ async function fightFunction(attacker: ImmortalCultivators, defencer: ImmortalCu
   // 播放动画
   await doAttacked(document.getElementById(`card_animate_${attacker.id}`))
   // 血量计算
-  defencer.currentLife = (defencer?.currentLife || 0) - (attacker?.attack || 0)
+  defencer.currentLife = (defencer?.currentLife || 0) - attacker.getAttack()
   await beAttacked(document.getElementById(`card_animate_${defencer.id}`))
 }
 
 
 async function startFight() {
+  fight.isStart = true
   fight.isFighting = true
   if (fight.fightNode.currentProgressIndex > (fight.fightNode.fightProgressList?.length || 0) - 1) {
     fight.isFighting = false
@@ -134,8 +135,13 @@ function clickStartFight() {
     </a-col>
     <a-col :span="4">
       <div>第{{ fight.round }}回合</div>
-      <a-checkbox v-model:checked="fight.isAutoNextRound" @change="changeAutoNext">自动</a-checkbox>
-      <a-button :disabled="fight.isAutoNextRound || fight.isFighting" @click="clickStartFight">下一个阶段</a-button>
+      <template v-if="fight.isStart">
+        <a-checkbox v-model:checked="fight.isAutoNextRound" @change="changeAutoNext">自动</a-checkbox>
+        <a-button :disabled="fight.isAutoNextRound || fight.isFighting" @click="clickStartFight">下一个阶段</a-button>
+      </template>
+      <template v-else>
+        <a-button @click="startFight">开始</a-button>
+      </template>
     </a-col>
     <a-col :span="10">
       <div v-for="item in fight.fightNode.getCurrentFightProgress()?.currentEnemy"
@@ -158,7 +164,7 @@ function clickStartFight() {
   </a-row>
   <a-row justify="space-between" align="center" style="margin: 20px">
     <a-col :span="10">
-<!--      日志 todo 自动往下滚动-->
+      <!--      日志 todo 自动往下滚动-->
       <div style="border:1px solid #40a9ff;border-radius: 6px;height: 400px">
         <div v-for="item in logStore.logs" :key="item" v-html="item"></div>
       </div>
@@ -167,7 +173,7 @@ function clickStartFight() {
       <a-divider type="vertical" style="height: 400px; background-color: #7cb305"/>
     </a-col>
     <a-col :span="13">
-<!--      个人信息-->
+      <!--      个人信息-->
       <div style="border:1px solid #40a9ff;border-radius: 6px;height: 400px">
         <a-row>
           <a-col flex="none">

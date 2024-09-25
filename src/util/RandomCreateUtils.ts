@@ -4,7 +4,7 @@ import {FightProgress, FightProgressInterFace} from "../objs/FightProgress.ts";
 import {FightNode, FightNodeInterface} from "../objs/FightNode.ts";
 
 
-export async function sleep(ms:number) {
+export async function sleep(ms: number) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
@@ -56,18 +56,25 @@ export const immortalCreate = (immortalCultivatorsInterface: ImmortalCultivators
         immortalCultivatorsInterface.birth = 0
     }
     if (!immortalCultivatorsInterface.level) {
-        immortalCultivatorsInterface.level = randomUtil.integer({min: 0, max: 100})
+        // 默认1级
+        immortalCultivatorsInterface.level = 0
     }
-    if (!immortalCultivatorsInterface.life) {
-        immortalCultivatorsInterface.life = randomUtil.integer({min: 0, max: 100})
+    const immortalCultivators = new ImmortalCultivators(immortalCultivatorsInterface);
+    const maxRemainingPoints = immortalCultivators.getMaxRemainingPoints();
+    // 均衡分配模式
+    const strings = [
+        "physique",
+        "soulForce",
+        "strength",
+    ];
+    for (let i = 0; i < maxRemainingPoints; i++) {
+        const pickone = randomUtil.pickone(strings);
+        // @ts-ignore
+        immortalCultivators[pickone] += 1;
     }
-    if (!immortalCultivatorsInterface.mana) {
-        immortalCultivatorsInterface.mana = randomUtil.integer({min: 0, max: 100})
-    }
-    if (!immortalCultivatorsInterface.attack) {
-        immortalCultivatorsInterface.attack = randomUtil.integer({min: 0, max: 50})
-    }
-    immortalCultivatorsInterface.currentLife = immortalCultivatorsInterface.life
-    immortalCultivatorsInterface.currentMana = immortalCultivatorsInterface.mana
-    return new ImmortalCultivators(immortalCultivatorsInterface)
+    immortalCultivators.usedPoints = immortalCultivators.getMaxRemainingPoints();
+
+    immortalCultivators.currentLife = immortalCultivators.getLife()
+    immortalCultivators.currentMana = immortalCultivators.getMana()
+    return immortalCultivators
 }
