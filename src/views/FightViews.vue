@@ -9,6 +9,7 @@ import {ImmortalCultivators} from "../objs/ImmortalCultivators.ts";
 import {message, Modal} from 'ant-design-vue';
 import {useLogStore} from "../store/useLogStore.ts";
 import {sleep} from "../util/RandomCreateUtils.ts";
+import {ref} from "vue";
 
 const fightStore = useFightStore()
 const logStore = useLogStore()
@@ -131,6 +132,10 @@ function clickStartFight() {
   fight.fightNode.currentProgressIndex++;
   startFight()
 }
+
+
+const activeKey = ref('CharacterInformation');
+const characterIndex = ref('1');
 </script>
 
 <template>
@@ -183,15 +188,53 @@ function clickStartFight() {
     </a-col>
     <a-col :span="13">
       <!--      个人信息-->
-      <div style="border:1px solid #40a9ff;border-radius: 6px;height: 400px">
-        <a-row>
-          <a-col flex="none">
-            <EquipmentCom></EquipmentCom>
-          </a-col>
-          <a-col flex="auto">
-            装备信息
-          </a-col>
-        </a-row>
+      <div style="border:1px solid #40a9ff;border-radius: 6px;height: 400px;padding: 10px">
+        <a-tabs v-model:activeKey="activeKey" type="card">
+          <a-tab-pane key="CharacterInformation" tab="人物信息">
+            <a-tabs
+                v-model:activeKey="characterIndex"
+                :style="{ height: '300px' }"
+                tab-position="left"
+            >
+              <a-tab-pane v-for="(item,i) in fight.player.getAllList()" :key="i" :tab="`${item.name}`">
+                <a-row>
+                  <a-col :span="6">
+                    <EquipmentCom></EquipmentCom>
+                  </a-col>
+                  <a-col :span="6">
+                    <div class="progress-container">
+                      <span>生命：</span>
+                      <a-progress
+                          :stroke-color="{from: '#108ee9',to: '#87d068',}"
+                          :percent="getPercent(item.currentLife,item.getLife())"
+                          status="active"
+                          :size="[300, 20]"
+                      />
+                    </div>
+                    <div class="progress-container">
+                      <span>法力：</span>
+                      <a-progress
+                          :stroke-color="{from: '#108ee9',to: '#87d068',}"
+                          :percent="getPercent(item.currentMana,item.getMana())"
+                          status="active"
+                          :size="[300, 20]"
+                      />
+                    </div>
+                    <a-row>
+                      <a-col :span="12">攻击力：{{item.getAttack()}}</a-col>
+                    </a-row>
+                  </a-col>
+                  <a-col :span="6">
+                    <div>属性</div>
+                  </a-col>
+                </a-row>
+              </a-tab-pane>
+            </a-tabs>
+          </a-tab-pane>
+          <a-tab-pane key="2" tab="背包" force-render>
+            背包
+          </a-tab-pane>
+        </a-tabs>
       </div>
     </a-col>
   </a-row>
