@@ -30,7 +30,7 @@ export const fightProgressCreate = (fightProgressInterFace: FightProgressInterFa
     }
 
     if (!fightProgressInterFace.type) {
-        fightProgressInterFace.type = randomUtil.pickone(["小兵", "灵力"]);
+        fightProgressInterFace.type = randomUtil.pickone([ "灵力"]);
     }
     if (["小兵"].includes(fightProgressInterFace.type)) {
         if (!fightProgressInterFace.currentEnemy) {
@@ -63,20 +63,24 @@ export const immortalCreate = (immortalCultivatorsInterface: ImmortalCultivators
     }
     const immortalCultivators = new ImmortalCultivators(immortalCultivatorsInterface);
     const maxRemainingPoints = immortalCultivators.getMaxRemainingPoints();
+    randomUsePoint(maxRemainingPoints, immortalCultivators)
+
+    immortalCultivators.currentLife = immortalCultivators.getLife()
+    immortalCultivators.currentMana = immortalCultivators.getMana()
+    return immortalCultivators
+}
+
+export function randomUsePoint(points: number, immortalCultivators: ImmortalCultivators) {
     // 均衡分配模式
     const strings = [
         "physique",
         "soulForce",
         "strength",
     ];
-    for (let i = 0; i < maxRemainingPoints; i++) {
+    for (let i = 0; i < points; i++) {
         const pickone = randomUtil.pickone(strings);
         // @ts-ignore
         immortalCultivators[pickone] += 1;
     }
-    immortalCultivators.usedPoints = immortalCultivators.getMaxRemainingPoints();
-
-    immortalCultivators.currentLife = immortalCultivators.getLife()
-    immortalCultivators.currentMana = immortalCultivators.getMana()
-    return immortalCultivators
+    immortalCultivators.usedPoints += points;
 }

@@ -2,10 +2,11 @@
 import {defineComponent, PropType} from 'vue'
 import {ImmortalCultivators} from "../objs/ImmortalCultivators.ts";
 import {getPercent} from "../util/ProbabilityUtils.ts";
+import {progressFormat} from "../util/StrUtils.ts";
 
 export default defineComponent({
   name: "PeopleCom",
-  methods: {getPercent},
+  methods: {progressFormat, getPercent},
   created() {
   },
   props: {
@@ -33,22 +34,22 @@ export default defineComponent({
     </template>
     <div>
       <div class="progress-container">
-        <span>生命：</span>
-                <span>{{immortalCultivator.currentLife}}/{{immortalCultivator.getLife()}}</span>
+<!--                <span>{{immortalCultivator.currentLife}}/{{immortalCultivator.getLife()}}</span>-->
         <a-progress
             :stroke-color="{from: '#108ee9',to: '#87d068',}"
             :percent="getPercent(immortalCultivator.currentLife,immortalCultivator.getLife())"
             status="active"
             :size="[300, 20]"
+            :format="(percent)=>progressFormat(percent,'生命')"
         />
       </div>
       <div class="progress-container">
-        <span>法力：</span>
         <a-progress
             :stroke-color="{from: '#108ee9',to: '#87d068',}"
             :percent="getPercent(immortalCultivator.currentMana,immortalCultivator.getMana())"
             status="active"
             :size="[300, 20]"
+            :format="(percent)=>progressFormat(percent,'法力')"
         />
       </div>
       <div class="progress-container">

@@ -10,6 +10,7 @@ import {message, Modal} from 'ant-design-vue';
 import {useLogStore} from "../store/useLogStore.ts";
 import {sleep} from "../util/RandomCreateUtils.ts";
 import {ref} from "vue";
+import {progressFormat} from "../util/StrUtils.ts";
 
 const fightStore = useFightStore()
 const logStore = useLogStore()
@@ -17,120 +18,120 @@ const fight: Fight = fightStore.fight;
 
 // 战斗执行
 async function doFight(): Promise<string> {
-  const currentFightProgress = fight.fightNode.getCurrentFightProgress();
-  if (['小兵'].includes(currentFightProgress.type)) {
-    // todo 先手问题，这里默认 player先手
-    let round2 = 0;
-    let isPlayer = true;
+    const currentFightProgress = fight.fightNode.getCurrentFightProgress();
+    if (['小兵'].includes(currentFightProgress.type)) {
+        // todo 先手问题，这里默认 player先手
+        let round2 = 0;
+        let isPlayer = true;
 
-    let playerFightIndex = 0;
-    let enemyFightIndex = 0;
-    const fightList = fight.player.getFightList();
-    const currentEnemy = (currentFightProgress?.currentEnemy || [])
-    while (true) {
-      const sPlayer = fightList.filter(item => item.isLife());
-      const sEnemy = currentEnemy.filter(item => item.isLife());
-      if (sPlayer.length == 0) {
-        // 战斗结束，失败了
-        return "失败了"
-      }
-      if (sEnemy.length == 0) {
-        // 战斗结束，胜利
-        return "胜利了"
-      }
-      if (isPlayer) {
-        const attack = fightList[playerFightIndex];
-        if (attack.isLife()) {
-          // 敌人随机选则一个
-          const immortalCultivator = randomUtil.pickone(sEnemy);
-          await fightFunction(attack, immortalCultivator);
-          isPlayer = false
+        let playerFightIndex = 0;
+        let enemyFightIndex = 0;
+        const fightList = fight.player.getFightList();
+        const currentEnemy = (currentFightProgress?.currentEnemy || [])
+        while (true) {
+            const sPlayer = fightList.filter(item => item.isLife());
+            const sEnemy = currentEnemy.filter(item => item.isLife());
+            if (sPlayer.length == 0) {
+                // 战斗结束，失败了
+                return "失败了"
+            }
+            if (sEnemy.length == 0) {
+                // 战斗结束，胜利
+                return "胜利了"
+            }
+            if (isPlayer) {
+                const attack = fightList[playerFightIndex];
+                if (attack.isLife()) {
+                    // 敌人随机选则一个
+                    const immortalCultivator = randomUtil.pickone(sEnemy);
+                    await fightFunction(attack, immortalCultivator);
+                    isPlayer = false
+                }
+                playerFightIndex++;
+                playerFightIndex = playerFightIndex % fightList.length;
+            } else {
+                const attack = currentEnemy[enemyFightIndex];
+                if (attack.isLife()) {
+                    // 敌人随机选则一个
+                    const immortalCultivator = randomUtil.pickone(sPlayer);
+                    await fightFunction(attack, immortalCultivator);
+                    isPlayer = true
+                }
+                enemyFightIndex++;
+                enemyFightIndex = enemyFightIndex % currentEnemy.length;
+            }
+            round2++;
+            if (round2 % 2 == 0) {
+                fight.round = round2 / 2;
+            }
         }
-        playerFightIndex++;
-        playerFightIndex = playerFightIndex % fightList.length;
-      } else {
-        const attack = currentEnemy[enemyFightIndex];
-        if (attack.isLife()) {
-          // 敌人随机选则一个
-          const immortalCultivator = randomUtil.pickone(sPlayer);
-          await fightFunction(attack, immortalCultivator);
-          isPlayer = true
-        }
-        enemyFightIndex++;
-        enemyFightIndex = enemyFightIndex % currentEnemy.length;
-      }
-      round2++;
-      if (round2 % 2 == 0) {
-        fight.round = round2 / 2;
-      }
+    } else if (['灵力'].includes(currentFightProgress.type)) {
+        // todo 这里是谁吸收呢？是玩家？随机一个？还是随机分配？
+        randomUtil.pickone(fight.player.getFightList()).currentLinLi += currentFightProgress.linLi;
+        return Promise.resolve("吸收灵力");
     }
-  } else if (['灵力'].includes(currentFightProgress.type)) {
-    // todo 这里是谁吸收呢？是玩家？随机一个？还是随机分配？
-    randomUtil.pickone(fight.player.getFightList()).currentLinLi += currentFightProgress.linLi;
-    return Promise.resolve("吸收灵力");
-  }
-  return Promise.resolve("还在开发中...");
+    return Promise.resolve("还在开发中...");
 }
 
 async function fightFunction(attacker: ImmortalCultivators, defencer: ImmortalCultivators) {
-  logStore.logAttack(attacker, defencer)
-  // 播放动画
-  await doAttacked(document.getElementById(`card_animate_${attacker.id}`))
-  // 血量计算
-  defencer.currentLife = (defencer?.currentLife || 0) - attacker.getAttack()
-  await beAttacked(document.getElementById(`card_animate_${defencer.id}`))
+    logStore.logAttack(attacker, defencer)
+    // 播放动画
+    await doAttacked(document.getElementById(`card_animate_${attacker.id}`))
+    // 血量计算
+    defencer.currentLife = (defencer?.currentLife || 0) - attacker.getAttack()
+    await beAttacked(document.getElementById(`card_animate_${defencer.id}`))
 }
 
 
 async function startFight() {
-  fight.isStart = true
-  fight.isFighting = true
-  if (fight.fightNode.currentProgressIndex > (fight.fightNode.fightProgressList?.length || 0) - 1) {
-    fight.isFighting = false
-    // 结束了 弹窗告知
-    // todo 加入日志
-    Modal.success({
-      title: '战斗信息',
-      content: '战斗完成了',
-    })
-    return
-  }
-  const type = await doFight();
-  // 重置回合
-  fight.round = 0;
-  if (['胜利了', '吸收灵力'].includes(type)) {
-    // todo 加入日志
-    message.success(type)
-    if (fight.isAutoNextRound) {
-      fight.fightNode.currentProgressIndex++;
-      // 继续运行
-      await startFight()
-    } else {
-      // 手动点击按钮
+    fight.isStart = true
+    fight.isFighting = true
+    if (fight.fightNode.currentProgressIndex > (fight.fightNode.fightProgressList?.length || 0) - 1) {
+        fight.isFighting = false
+        // 结束了 弹窗告知
+        // todo 加入日志
+        Modal.success({
+            title: '战斗信息',
+            content: '战斗完成了',
+        })
+        return
     }
-  } else if (type === '失败了') {
-    // todo 加入日志
-    // 弹窗告知
-    Modal.error({
-      title: '战斗信息',
-      content: '失败了',
-    })
-  }
-  await sleep(1000)
-  fight.isFighting = false
+    const type = await doFight();
+    // 重置回合
+    fight.round = 0;
+    if (['胜利了', '吸收灵力'].includes(type)) {
+        // todo 加入日志
+        message.success(type)
+        if (fight.isAutoNextRound) {
+            fight.fightNode.currentProgressIndex++;
+            // 继续运行
+            await startFight()
+        } else {
+            // 手动点击按钮
+        }
+    } else if (type === '失败了') {
+        // todo 加入日志
+        // 弹窗告知
+        Modal.error({
+            title: '战斗信息',
+            content: '失败了',
+        })
+    }
+    await sleep(1000)
+    fight.isFighting = false
 }
 
 
 function changeAutoNext() {
-  if (fight.isAutoNextRound && !fight.isFighting) {
-    fight.fightNode.currentProgressIndex++;
-    startFight()
-  }
+    if (fight.isAutoNextRound && !fight.isFighting) {
+        fight.fightNode.currentProgressIndex++;
+        startFight()
+    }
 }
 
 function clickStartFight() {
-  fight.fightNode.currentProgressIndex++;
-  startFight()
+    fight.fightNode.currentProgressIndex++;
+    startFight()
 }
 
 
@@ -141,103 +142,118 @@ const characterIndex = ref('1');
 <template>
   <!--PC，安卓存在挤在一起问题-->
   <!--战斗区域-->
-  <a-row style="padding: 20px" justify="space-between">
-    <a-col :span="8">
-      <div v-for="item in fight.player.getFightList()" :key="item.id">
-        <PeopleCom :immortal-cultivator="item"></PeopleCom>
-      </div>
-    </a-col>
-    <a-col :span="4">
-      <div>第{{ fight.round }}回合</div>
-      <template v-if="fight.isStart">
-        <a-checkbox v-model:checked="fight.isAutoNextRound" @change="changeAutoNext">自动</a-checkbox>
-        <a-button :disabled="fight.isAutoNextRound || fight.isFighting" @click="clickStartFight">下一个阶段</a-button>
-      </template>
-      <template v-else>
-        <a-button @click="startFight">开始</a-button>
-      </template>
-    </a-col>
-    <a-col :span="10">
-      <div v-for="item in fight.fightNode.getCurrentFightProgress()?.currentEnemy"
-           v-if="fight.fightNode.getCurrentFightProgress()?.currentEnemy" :key="item.id">
-        <PeopleCom :immortal-cultivator="item"></PeopleCom>
-      </div>
-    </a-col>
-  </a-row>
+    <a-row style="padding: 20px" justify="space-between">
+        <a-col :span="8">
+            <div v-for="item in fight.player.getFightList()" :key="item.id">
+                <PeopleCom :immortal-cultivator="item"></PeopleCom>
+            </div>
+        </a-col>
+        <a-col :span="4">
+            <div>第{{ fight.round }}回合</div>
+            <template v-if="fight.isStart">
+                <a-checkbox v-model:checked="fight.isAutoNextRound" @change="changeAutoNext">自动</a-checkbox>
+                <a-button :disabled="fight.isAutoNextRound || fight.isFighting" @click="clickStartFight">下一个阶段
+                </a-button>
+            </template>
+            <template v-else>
+                <a-button @click="startFight">开始</a-button>
+            </template>
+        </a-col>
+        <a-col :span="10">
+            <div v-for="item in fight.fightNode.getCurrentFightProgress()?.currentEnemy"
+                 v-if="fight.fightNode.getCurrentFightProgress()?.currentEnemy" :key="item.id">
+                <PeopleCom :immortal-cultivator="item"></PeopleCom>
+            </div>
+        </a-col>
+    </a-row>
   <!--  进度区域-->
-  <a-row style="padding: 20px">
-    <a-flex style="margin:5px;width: 100%;height: 80px;border-radius: 6px;border: 1px solid #40a9ff"
-            justify="space-between" align="center">
-      <span>进  度：</span>
-      <a-card v-for="item in fight.fightNode.getNextFightProgressList()" :key="item.id">
-        {{ item.type }}
-      </a-card>
-    </a-flex>
-    <a-progress :percent="getPercent(fight.fightNode.currentProgressIndex,fight.fightNode.fightProgressList?.length)"
+    <a-row style="padding: 20px">
+        <a-flex style="margin:5px;width: 100%;height: 80px;border-radius: 6px;border: 1px solid #40a9ff"
+                justify="space-between" align="center">
+            <span>进  度：</span>
+            <a-card v-for="item in fight.fightNode.getNextFightProgressList()" :key="item.id">
+                {{ item.type }}
+            </a-card>
+        </a-flex>
+        <a-progress
+                :percent="getPercent(fight.fightNode.currentProgressIndex,fight.fightNode.fightProgressList?.length)"
                 :size="[800, 20]"/>
-  </a-row>
-  <a-row justify="space-between" align="center" style="margin: 20px">
-    <a-col :span="10">
-      <!--      日志 todo 自动往下滚动-->
-      <div style="border:1px solid #40a9ff;border-radius: 6px;height: 400px">
-        <div v-for="item in logStore.logs" :key="item" v-html="item"></div>
-      </div>
-    </a-col>
-    <a-col>
-      <a-divider type="vertical" style="height: 400px; background-color: #7cb305"/>
-    </a-col>
-    <a-col :span="13">
-      <!--      个人信息-->
-      <div style="border:1px solid #40a9ff;border-radius: 6px;height: 400px;padding: 10px">
-        <a-tabs v-model:activeKey="activeKey" type="card">
-          <a-tab-pane key="CharacterInformation" tab="人物信息">
-            <a-tabs
-                v-model:activeKey="characterIndex"
-                :style="{ height: '300px' }"
-                tab-position="left"
-            >
-              <a-tab-pane v-for="(item,i) in fight.player.getAllList()" :key="i" :tab="`${item.name}`">
-                <a-row>
-                  <a-col :span="6">
-                    <EquipmentCom></EquipmentCom>
-                  </a-col>
-                  <a-col :span="6">
-                    <div class="progress-container">
-                      <span>生命：</span>
-                      <a-progress
-                          :stroke-color="{from: '#108ee9',to: '#87d068',}"
-                          :percent="getPercent(item.currentLife,item.getLife())"
-                          status="active"
-                          :size="[300, 20]"
-                      />
-                    </div>
-                    <div class="progress-container">
-                      <span>法力：</span>
-                      <a-progress
-                          :stroke-color="{from: '#108ee9',to: '#87d068',}"
-                          :percent="getPercent(item.currentMana,item.getMana())"
-                          status="active"
-                          :size="[300, 20]"
-                      />
-                    </div>
-                    <a-row>
-                      <a-col :span="12">攻击力：{{item.getAttack()}}</a-col>
-                    </a-row>
-                  </a-col>
-                  <a-col :span="6">
-                    <div>属性</div>
-                  </a-col>
-                </a-row>
-              </a-tab-pane>
-            </a-tabs>
-          </a-tab-pane>
-          <a-tab-pane key="2" tab="背包" force-render>
-            背包
-          </a-tab-pane>
-        </a-tabs>
-      </div>
-    </a-col>
-  </a-row>
+    </a-row>
+    <a-row justify="space-between" align="center" style="margin: 20px">
+        <a-col :span="10">
+            <!--      日志 todo 自动往下滚动-->
+            <div style="border:1px solid #40a9ff;border-radius: 6px;height: 400px">
+                <div v-for="item in logStore.logs" :key="item" v-html="item"></div>
+            </div>
+        </a-col>
+        <a-col>
+            <a-divider type="vertical" style="height: 400px; background-color: #7cb305"/>
+        </a-col>
+        <a-col :span="13">
+            <!--      个人信息-->
+            <div style="border:1px solid #40a9ff;border-radius: 6px;height: 400px;padding: 10px">
+                <a-tabs v-model:activeKey="activeKey" type="card">
+                    <a-tab-pane key="CharacterInformation" tab="人物信息">
+                        <a-tabs
+                                v-model:activeKey="characterIndex"
+                                :style="{ height: '300px' }"
+                                tab-position="left"
+                        >
+                            <a-tab-pane v-for="(item,i) in fight.player.getAllList()" :key="i" :tab="`${item.name}`">
+                                <a-row>
+                                    <a-col :span="6">
+                                        <EquipmentCom></EquipmentCom>
+                                    </a-col>
+                                    <a-col :span="6">
+                                        <div style="overflow: hidden;">
+                                            境界：{{ item.getLevelStr() }}
+                                            <a-button v-if="item.canUpdateLevel()" size="small" @click="item.doUpdateLevel()">突破</a-button>
+                                        </div>
+                                        <div class="progress-container">
+                                            <a-progress
+                                                :stroke-color="{from: '#108ee9',to: '#87d068',}"
+                                                :percent="getPercent(item.currentLinLi,item.getUpdateLinLi())"
+                                                status="active"
+                                                :size="[300, 20]"
+                                                :format="(percent)=>progressFormat(percent,'灵力')"
+                                            ></a-progress>
+                                        </div>
+                                        <div class="progress-container">
+                                            <a-progress
+                                                    :stroke-color="{from: '#108ee9',to: '#87d068',}"
+                                                    :percent="getPercent(item.currentLife,item.getLife())"
+                                                    status="active"
+                                                    :size="[300, 20]"
+                                                    :format="(percent)=>progressFormat(percent,'生命')"
+                                            ></a-progress>
+                                        </div>
+                                        <div class="progress-container">
+                                            <a-progress
+                                                    :stroke-color="{from: '#108ee9',to: '#87d068',}"
+                                                    :percent="getPercent(item.currentMana,item.getMana())"
+                                                    status="active"
+                                                    :size="[300, 20]"
+                                                    :format="(percent)=>progressFormat(percent,'法力')"
+                                            />
+                                        </div>
+                                        <a-row>
+                                            <a-col :span="12">攻击力：{{ item.getAttack() }}</a-col>
+                                        </a-row>
+                                    </a-col>
+                                    <a-col :span="6">
+                                        <div>属性</div>
+                                    </a-col>
+                                </a-row>
+                            </a-tab-pane>
+                        </a-tabs>
+                    </a-tab-pane>
+                    <a-tab-pane key="2" tab="背包" force-render>
+                        背包
+                    </a-tab-pane>
+                </a-tabs>
+            </div>
+        </a-col>
+    </a-row>
   <!--  战斗日志-->
 </template>
 

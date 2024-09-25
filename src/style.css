@@ -1,7 +1,12 @@
 
 .progress-container .ant-progress-text{
     position: absolute;
-    left: 0;
+    left: 0px;
+    top:5px;
+}
+
+.progress-container .ant-progress-outer{
+    padding: 0 !important;
 }
 
 .people-com{

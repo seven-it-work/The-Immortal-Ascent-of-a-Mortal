@@ -1,3 +1,5 @@
+import {randomUsePoint} from "../util/RandomCreateUtils.ts";
+
 const temp: string[] = []
 const jj = [
     "练气期",
@@ -97,7 +99,7 @@ export class ImmortalCultivators implements ImmortalCultivatorsInterface {
     }
 
     canUpdateLevel(): boolean {
-        return this.currentLinLi > this.getUpdateLinLi();
+        return this.currentLinLi >= this.getUpdateLinLi();
     }
 
     getUpdateLinLi(): number {
@@ -109,6 +111,9 @@ export class ImmortalCultivators implements ImmortalCultivatorsInterface {
         if (this.canUpdateLevel()) {
             this.level++;
             this.currentLinLi = 0;
+            // 突破的点数随机加（玩家也是如此）
+            const number = this.getMaxRemainingPoints() - this.usedPoints;
+            randomUsePoint(number, this);
         }
     }
 }
