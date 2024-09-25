@@ -8,7 +8,7 @@ import {getPercent, randomUtil} from "../util/ProbabilityUtils.ts";
 import {ImmortalCultivators} from "../objs/ImmortalCultivators.ts";
 import {message, Modal} from 'ant-design-vue';
 import {useLogStore} from "../store/useLogStore.ts";
-import {sleep} from "../util/RandomCreateUtils.ts";
+import {fightNodeCreate, sleep} from "../util/RandomCreateUtils.ts";
 import {ref} from "vue";
 import {progressFormat} from "../util/StrUtils.ts";
 
@@ -86,20 +86,33 @@ async function fightFunction(attacker: ImmortalCultivators, defencer: ImmortalCu
 async function startFight() {
     fight.isStart = true
     fight.isFighting = true
+    await sleep(1000)
     if (fight.fightNode.currentProgressIndex > (fight.fightNode.fightProgressList?.length || 0) - 1) {
         fight.isFighting = false
         // 结束了 弹窗告知
         // todo 加入日志
+        // todo 这里cancel为什么没有
         Modal.success({
             title: '战斗信息',
             content: '战斗完成了',
+            okText: '继续战斗',
+            cancelText: '知道了',
+            onOk: () => {
+                fight.fightNode = fightNodeCreate()
+                startFight()
+            }
         })
         return
     }
     const type = await doFight();
     // 重置回合
     fight.round = 0;
-    if (['胜利了', '吸收灵力'].includes(type)) {
+    if (['吸收灵力'].includes(type)) {
+        fight.fightNode.currentProgressIndex++;
+        // 继续运行
+        await startFight()
+        return
+    } else if (['胜利了'].includes(type)) {
         // todo 加入日志
         message.success(type)
         if (fight.isAutoNextRound) {
@@ -117,7 +130,6 @@ async function startFight() {
             content: '失败了',
         })
     }
-    await sleep(1000)
     fight.isFighting = false
 }
 
@@ -207,15 +219,17 @@ const characterIndex = ref('1');
                                     <a-col :span="6">
                                         <div style="overflow: hidden;">
                                             境界：{{ item.getLevelStr() }}
-                                            <a-button v-if="item.canUpdateLevel()" size="small" @click="item.doUpdateLevel()">突破</a-button>
+                                            <a-button v-if="item.canUpdateLevel()" size="small"
+                                                      @click="item.doUpdateLevel()">突破
+                                            </a-button>
                                         </div>
                                         <div class="progress-container">
                                             <a-progress
-                                                :stroke-color="{from: '#108ee9',to: '#87d068',}"
-                                                :percent="getPercent(item.currentLinLi,item.getUpdateLinLi())"
-                                                status="active"
-                                                :size="[300, 20]"
-                                                :format="(percent)=>progressFormat(percent,'灵力')"
+                                                    :stroke-color="{from: '#108ee9',to: '#87d068',}"
+                                                    :percent="getPercent(item.currentLinLi,item.getUpdateLinLi())"
+                                                    status="active"
+                                                    :size="[300, 20]"
+                                                    :format="(percent)=>progressFormat(percent,'灵力')"
                                             ></a-progress>
                                         </div>
                                         <div class="progress-container">

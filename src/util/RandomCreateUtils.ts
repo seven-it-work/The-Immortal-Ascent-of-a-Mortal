@@ -16,7 +16,7 @@ export const fightNodeCreate = (fightNodeInterface: FightNodeInterface = {}): Fi
     if (!fightNodeInterface.fightProgressList) {
         fightNodeInterface.fightProgressList = []
         // 初始化数量
-        const integer = randomUtil.integer({min: 3, max: 10});
+        const integer = randomUtil.integer({min: 1, max: 2});
         for (let i = 0; i < integer; i++) {
             fightNodeInterface.fightProgressList.push(fightProgressCreate())
         }
@@ -30,7 +30,7 @@ export const fightProgressCreate = (fightProgressInterFace: FightProgressInterFa
     }
 
     if (!fightProgressInterFace.type) {
-        fightProgressInterFace.type = randomUtil.pickone([ "灵力"]);
+        fightProgressInterFace.type = randomUtil.pickone(["小兵", "灵力"]);
     }
     if (["小兵"].includes(fightProgressInterFace.type)) {
         if (!fightProgressInterFace.currentEnemy) {

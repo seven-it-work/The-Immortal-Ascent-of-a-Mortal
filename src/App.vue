@@ -4,6 +4,11 @@ import {Player} from "./objs/Player.ts";
 import {fightNodeCreate, immortalCreate} from "./util/RandomCreateUtils.ts";
 import {Fight} from "./objs/Fight.ts";
 import {useFightStore} from "./store/useFightStore.ts";
+import zhCN from 'ant-design-vue/es/locale/zh_CN';
+// import dayjs from 'dayjs';
+import 'dayjs/locale/zh-cn';
+// dayjs.locale('zh-cn');
+const locale=zhCN
 
 // 初始化player
 const immortalCultivators = immortalCreate({level: 1, physique: 50});
@@ -15,7 +20,9 @@ useFightStore().init(fight)
 </script>
 
 <template>
-  <FightViews></FightViews>
+    <a-config-provider :locale="locale">
+        <FightViews></FightViews>
+    </a-config-provider>
 </template>
 
 <style scoped>
