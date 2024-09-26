@@ -1,5 +1,7 @@
 import {randomUsePoint} from "../util/RandomCreateUtils.ts";
 
+import {BaseEquipment} from "./Equipment.ts";
+
 const temp: string[] = []
 const jj = [
     "练气期",
@@ -54,6 +56,8 @@ export interface ImmortalCultivatorsInterface {
     usedPoints?: number;
     // 当前灵力
     currentLinLi?: number;
+    // 背包
+    baseEquipment?: BaseEquipment[];
 }
 
 export class ImmortalCultivators implements ImmortalCultivatorsInterface {
@@ -68,6 +72,8 @@ export class ImmortalCultivators implements ImmortalCultivatorsInterface {
     currentMana: number = 0;
     usedPoints: number = 0;
     currentLinLi: number = 0;
+    // 背包
+    baseEquipment: BaseEquipment[] = [];
 
     getAttack(): number {
         return this.strength || 0;

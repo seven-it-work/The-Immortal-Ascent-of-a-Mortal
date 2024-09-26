@@ -2,7 +2,57 @@ import {ImmortalCultivators, ImmortalCultivatorsInterface} from "../objs/Immorta
 import {randomUtil, uuid} from "./ProbabilityUtils.ts";
 import {FightProgress, FightProgressInterFace} from "../objs/FightProgress.ts";
 import {FightNode, FightNodeInterface} from "../objs/FightNode.ts";
+import {Armor, EquipmentInterface, EquipmentLocation, Mount, Weapon} from "../objs/Equipment.ts";
 
+
+export function createEquipment(equipmentInterface: EquipmentInterface = {}) {
+    if (!equipmentInterface.requiredEquipmentLevel) {
+        equipmentInterface.requiredEquipmentLevel = 1;
+    }
+    const level = equipmentInterface.requiredEquipmentLevel;
+
+    const arrmorList = [
+        EquipmentLocation.CLOTHE,
+        EquipmentLocation.BOTTLE,
+        EquipmentLocation.SHOE,
+        EquipmentLocation.BELT,
+        EquipmentLocation.RING,
+        EquipmentLocation.NECKLACE,
+    ]
+    let enumValue = randomUtil.pickone([
+        EquipmentLocation.WEAPON,
+        EquipmentLocation.MOUNT,
+        ...arrmorList
+    ]);
+    if (equipmentInterface.equipmentLocation !== undefined) {
+        enumValue = equipmentInterface.equipmentLocation;
+    }
+    equipmentInterface.equipmentLocation = enumValue
+    if (enumValue === EquipmentLocation.WEAPON) {
+        const weapon = new Weapon(equipmentInterface);
+        weapon.id = uuid();
+        weapon.name = "测试🗡"
+        weapon.attack = level
+        return weapon
+    } else if (enumValue === EquipmentLocation.MOUNT) {
+        const mount = new Mount(equipmentInterface);
+        mount.id = uuid();
+        mount.name = "测试🐎"
+        // 展示不知道加什么属性
+        return mount
+    } else {
+        // 随机生成防具信息
+        const armor = new Armor(equipmentInterface);
+        armor.id = uuid();
+        armor.name = "测试衣"
+        const points = 2 * level;
+        for (let i = 0; i < points; i++) {
+            // @ts-ignore
+            armor[randomUtil.pickone(['life', 'mana'])] += 1;
+        }
+        return armor
+    }
+}
 
 export async function sleep(ms: number) {
     return new Promise(resolve => setTimeout(resolve, ms));
