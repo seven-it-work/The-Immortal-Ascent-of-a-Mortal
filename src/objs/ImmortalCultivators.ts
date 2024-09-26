@@ -39,6 +39,10 @@ for (let i = 0; i < jj2.length; i++) {
     }
 }
 
+export const getLevelStr=(level:number|undefined):string=>{
+    return temp[level || 0]
+}
+
 export interface ImmortalCultivatorsInterface {
     id?: string | undefined;
     name?: string | undefined;
@@ -89,7 +93,7 @@ export class ImmortalCultivators implements ImmortalCultivatorsInterface {
 
 
     getLevelStr(): string {
-        return temp[this.level || 0]
+        return getLevelStr(this.level)
     }
 
     getMaxRemainingPoints(): number {

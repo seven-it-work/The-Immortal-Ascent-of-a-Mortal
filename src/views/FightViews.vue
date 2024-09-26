@@ -5,12 +5,12 @@ import {useFightStore} from "../store/useFightStore.ts";
 import {Fight} from "../objs/Fight.ts";
 import {beAttacked, doAttacked} from "../util/AnimateUtils.ts";
 import {getPercent, randomUtil} from "../util/ProbabilityUtils.ts";
-import {ImmortalCultivators} from "../objs/ImmortalCultivators.ts";
+import {getLevelStr, ImmortalCultivators} from "../objs/ImmortalCultivators.ts";
 import {message, Modal} from 'ant-design-vue';
 import {useLogStore} from "../store/useLogStore.ts";
 import {fightNodeCreate, sleep, createEquipment} from "../util/RandomCreateUtils.ts";
 import {ref} from "vue";
-import {progressFormat} from "../util/StrUtils.ts";
+import {progressFormat, textEllipsis} from "../util/StrUtils.ts";
 
 const fightStore = useFightStore()
 const logStore = useLogStore()
@@ -265,8 +265,24 @@ const characterIndex = ref('1');
             </a-tabs>
           </a-tab-pane>
           <a-tab-pane key="2" tab="背包" force-render>
-            <div v-for="item in fight.player.playerInfo.baseEquipment">
-              {{ item }}
+            <div v-for="item in fight.player.playerInfo.baseEquipment" :key="item.id">
+              <a-card
+                  style="width: 60px; height: 60px;margin: 5px"
+                  :bodyStyle="{ margin: '0', padding: '0' }"
+              >
+                <div style="width: 100%; height: 60px;" class="center-content" >
+                  <a-tooltip>
+                    {{ textEllipsis(item.name) }}
+                    <template #title>
+                      <div>名称：{{item.name}}</div>
+                      <div>装备境界：{{getLevelStr(item.requiredEquipmentLevel)}}</div>
+                      <div v-if="item.attack">攻击：+{{item.attack}}</div>
+                      <div v-if="item.life">生命：+{{item.life}}</div>
+                      <div v-if="item.mana">法力：+{{ item.mana}}</div>
+                    </template>
+                  </a-tooltip>
+                </div>
+              </a-card>
             </div>
           </a-tab-pane>
         </a-tabs>
