@@ -12,9 +12,12 @@ export const useLogStore = defineStore('log', {
         logs: []
     }),
     actions: {
-        logAttack(attack: ImmortalCultivators, defrense: ImmortalCultivators) {
-            this.logs.push(`<div>${attack.name}对${defrense.name}进行攻击</div>`)
-        }
+        logAttack(attack: ImmortalCultivators, defrense: ImmortalCultivators,harm:number) {
+            this.logs.push(`<div>${attack.name}对${defrense.name}进行攻击，造成${harm}点伤害</div>`)
+        },
+        logAvoid(defrense: ImmortalCultivators) {
+            this.logs.push(`<div>${defrense.name}躲避成功</div>`)
+        },
     },
     getters: {},
 });

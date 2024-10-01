@@ -126,6 +126,11 @@ export function randomUsePoint(points: number, immortalCultivators: ImmortalCult
         "physique",
         "soulForce",
         "strength",
+        "toughness",
+        "erupt",
+        "blast",
+        "hit",
+        "avoid",
     ];
     for (let i = 0; i < points; i++) {
         const pickone = randomUtil.pickone(strings);
