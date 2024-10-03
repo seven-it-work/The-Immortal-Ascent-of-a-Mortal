@@ -18,6 +18,9 @@ export const useLogStore = defineStore('log', {
         logAvoid(defrense: ImmortalCultivators) {
             this.logs.push(`<div>${defrense.name}躲避成功</div>`)
         },
+        init(logs:string[]){
+          this.logs=logs;
+        },
     },
     getters: {},
 });

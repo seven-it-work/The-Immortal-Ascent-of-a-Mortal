@@ -2,6 +2,7 @@ import {randomUsePoint} from "../util/RandomCreateUtils.ts";
 
 import {BaseEquipment} from "./Equipment.ts";
 import {randomProbability} from "../util/ProbabilityUtils.ts";
+import {SaveFunction} from "../util/SaveUtils.ts";
 
 const temp: string[] = []
 const jj = [
@@ -77,7 +78,24 @@ export interface ImmortalCultivatorsInterface {
     avoidCount?: number;
 }
 
-export class ImmortalCultivators implements ImmortalCultivatorsInterface {
+export class ImmortalCultivators implements ImmortalCultivatorsInterface, SaveFunction<ImmortalCultivators> {
+    doLoad(dataStr: string): ImmortalCultivators {
+        return this.doLoadByObj(JSON.parse(dataStr));
+    }
+
+    doLoadByObj(obj: any): ImmortalCultivators {
+        if (!obj) {
+            return this;
+        }
+        Object.assign(this, obj);
+        this.baseEquipment = obj.baseEquipment?.map((data: any)=> new BaseEquipment().doLoadByObj(data));
+        return this;
+    }
+
+    doSave(): string {
+        return JSON.stringify(this);
+    }
+
     birth: number = 0;
     id: string = "";
     level: number = 0;
@@ -166,7 +184,7 @@ export class ImmortalCultivators implements ImmortalCultivatorsInterface {
         return ((this.level || 0) + 1) * 10
     }
 
-    constructor(immortalCultivatorsInterface: ImmortalCultivatorsInterface) {
+    constructor(immortalCultivatorsInterface?: ImmortalCultivatorsInterface) {
         Object.assign(this, immortalCultivatorsInterface)
     }
 

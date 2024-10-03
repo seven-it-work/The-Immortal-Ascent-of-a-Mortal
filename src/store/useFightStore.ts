@@ -11,10 +11,17 @@ export const useFightStore = defineStore('fight', {
     state: (): State => ({}),
     actions: {
         init(fight: Fight) {
+            console.log(fight)
             this.fight = fight;
         },
     },
     getters: {
+        getFight(state: State): Fight {
+            if (!state.fight) {
+                throw new Error("没有数据")
+            }
+            return state.fight;
+        }
     },
 });
 

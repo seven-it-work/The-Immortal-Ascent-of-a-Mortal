@@ -1,3 +1,5 @@
+import {SaveFunction} from "../util/SaveUtils.ts";
+
 const weaponType = [
     '剑',
     '刀',
@@ -42,7 +44,23 @@ export interface EquipmentInterface {
     mana?: number
 }
 
-export class BaseEquipment implements EquipmentInterface {
+export class BaseEquipment implements EquipmentInterface, SaveFunction<BaseEquipment> {
+    doLoad(dataStr: string): BaseEquipment {
+        return this.doLoadByObj(JSON.parse(dataStr));
+    }
+
+    doLoadByObj(obj: any): BaseEquipment {
+        if (!obj) {
+            return this;
+        }
+        Object.assign(this, obj);
+        return this;
+    }
+
+    doSave(): string {
+        return JSON.stringify(this);
+    }
+
     type?: 'WEAPON' | 'ARMOR' | 'MOUNT';
     id?: string;
     name?: string;
@@ -51,7 +69,7 @@ export class BaseEquipment implements EquipmentInterface {
     life: number = 0;
     mana: number = 0;
 
-    constructor(equipmentInterface: EquipmentInterface) {
+    constructor(equipmentInterface?: EquipmentInterface) {
         Object.assign(this, equipmentInterface);
     }
 }

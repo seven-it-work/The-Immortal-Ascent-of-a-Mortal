@@ -14,11 +14,11 @@ import {progressFormat, textEllipsis} from "../util/StrUtils.ts";
 
 const fightStore = useFightStore()
 const logStore = useLogStore()
-const fight: Fight = fightStore.fight;
+const fight: Fight = fightStore.getFight;
 
 // 战斗执行
 async function doFight(): Promise<string> {
-    const currentFightProgress = fight.fightNode.getCurrentFightProgress();
+    const currentFightProgress = fightStore.getFight.fightNode.getCurrentFightProgress();
     if (['小兵'].includes(currentFightProgress.type)) {
         // todo 先手问题，这里默认 player先手
         let round2 = 0;
@@ -26,7 +26,7 @@ async function doFight(): Promise<string> {
 
         let playerFightIndex = 0;
         let enemyFightIndex = 0;
-        const fightList = fight.player.getFightList();
+        const fightList = fightStore.getFight.player.getFightList();
         const currentEnemy = (currentFightProgress?.currentEnemy || [])
         while (true) {
             const sPlayer = fightList.filter(item => item.isLife());
@@ -39,7 +39,7 @@ async function doFight(): Promise<string> {
                 // 战斗结束，胜利
                 // 物品掉落
                 const equipment = createEquipment({});
-                fight.player.playerInfo.baseEquipment.push(equipment)
+                fightStore.getFight.player.playerInfo.baseEquipment.push(equipment)
                 return "胜利了"
             }
             if (isPlayer) {
@@ -65,12 +65,12 @@ async function doFight(): Promise<string> {
             }
             round2++;
             if (round2 % 2 == 0) {
-                fight.round = round2 / 2;
+                fightStore.getFight.round = round2 / 2;
             }
         }
     } else if (['灵力'].includes(currentFightProgress.type)) {
         // todo 这里是谁吸收呢？是玩家？随机一个？还是随机分配？
-        randomUtil.pickone(fight.player.getFightList()).currentLinLi += currentFightProgress.linLi;
+        randomUtil.pickone(fightStore.getFight.player.getFightList()).currentLinLi += currentFightProgress.linLi;
         return Promise.resolve("吸收灵力");
     }
     return Promise.resolve("还在开发中...");
@@ -111,11 +111,11 @@ function fightTargetAndGetHarm(attacker: ImmortalCultivators, defencer: Immortal
 
 
 async function startFight() {
-    fight.isStart = true
-    fight.isFighting = true
+    fightStore.getFight.isStart = true
+    fightStore.getFight.isFighting = true
     await sleep(1000)
-    if (fight.fightNode.currentProgressIndex > (fight.fightNode.fightProgressList?.length || 0) - 1) {
-        fight.isFighting = false
+    if (fightStore.getFight.fightNode.currentProgressIndex > (fightStore.getFight.fightNode.fightProgressList?.length || 0) - 1) {
+        fightStore.getFight.isFighting = false
         // 结束了 弹窗告知
         // todo 加入日志
         // todo 这里cancel为什么没有
@@ -125,7 +125,7 @@ async function startFight() {
             okText: '继续战斗',
             cancelText: '知道了',
             onOk: () => {
-                fight.fightNode = fightNodeCreate()
+                fightStore.getFight.fightNode = fightNodeCreate()
                 startFight()
             }
         })
@@ -133,17 +133,17 @@ async function startFight() {
     }
     const type = await doFight();
     // 重置回合
-    fight.round = 0;
+    fightStore.getFight.round = 0;
     if (['吸收灵力'].includes(type)) {
-        fight.fightNode.currentProgressIndex++;
+        fightStore.getFight.fightNode.currentProgressIndex++;
         // 继续运行
         await startFight()
         return
     } else if (['胜利了'].includes(type)) {
         // todo 加入日志
         message.success(type)
-        if (fight.isAutoNextRound) {
-            fight.fightNode.currentProgressIndex++;
+        if (fightStore.getFight.isAutoNextRound) {
+            fightStore.getFight.fightNode.currentProgressIndex++;
             // 继续运行
             await startFight()
         } else {
@@ -157,19 +157,19 @@ async function startFight() {
             content: '失败了',
         })
     }
-    fight.isFighting = false
+    fightStore.getFight.isFighting = false
 }
 
 
 function changeAutoNext() {
-    if (fight.isAutoNextRound && !fight.isFighting) {
-        fight.fightNode.currentProgressIndex++;
+    if (fightStore.getFight.isAutoNextRound && !fightStore.getFight.isFighting) {
+        fightStore.getFight.fightNode.currentProgressIndex++;
         startFight()
     }
 }
 
 function clickStartFight() {
-    fight.fightNode.currentProgressIndex++;
+    fightStore.getFight.fightNode.currentProgressIndex++;
     startFight()
 }
 
@@ -183,15 +183,15 @@ const characterIndex = ref('1');
   <!--战斗区域-->
     <a-row style="padding: 20px" justify="space-between">
         <a-col :span="8">
-            <div v-for="item in fight.player.getFightList()" :key="item.id">
+            <div v-for="item in fightStore.getFight.player.getFightList()" :key="item.id">
                 <PeopleCom :immortal-cultivator="item"></PeopleCom>
             </div>
         </a-col>
         <a-col :span="4">
-            <div>第{{ fight.round }}回合</div>
-            <template v-if="fight.isStart">
-                <a-checkbox v-model:checked="fight.isAutoNextRound" @change="changeAutoNext">自动</a-checkbox>
-                <a-button :disabled="fight.isAutoNextRound || fight.isFighting" @click="clickStartFight">下一个阶段
+            <div>第{{ fightStore.getFight.round }}回合</div>
+            <template v-if="fightStore.getFight.isStart">
+                <a-checkbox v-model:checked="fightStore.getFight.isAutoNextRound" @change="changeAutoNext">自动</a-checkbox>
+                <a-button :disabled="fightStore.getFight.isAutoNextRound || fightStore.getFight.isFighting" @click="clickStartFight">下一个阶段
                 </a-button>
             </template>
             <template v-else>
@@ -199,8 +199,8 @@ const characterIndex = ref('1');
             </template>
         </a-col>
         <a-col :span="10">
-            <div v-for="item in fight.fightNode.getCurrentFightProgress()?.currentEnemy"
-                 v-if="fight.fightNode.getCurrentFightProgress()?.currentEnemy" :key="item.id">
+            <div v-for="item in fightStore.getFight.fightNode.getCurrentFightProgress()?.currentEnemy"
+                 v-if="fightStore.getFight.fightNode.getCurrentFightProgress()?.currentEnemy" :key="item.id">
                 <PeopleCom :immortal-cultivator="item"></PeopleCom>
             </div>
         </a-col>
@@ -210,12 +210,12 @@ const characterIndex = ref('1');
         <a-flex style="margin:5px;width: 100%;height: 80px;border-radius: 6px;border: 1px solid #40a9ff"
                 justify="space-between" align="center">
             <span>进  度：</span>
-            <a-card v-for="item in fight.fightNode.getNextFightProgressList()" :key="item.id">
+            <a-card v-for="item in fightStore.getFight.fightNode.getNextFightProgressList()" :key="item.id">
                 {{ item.type }}
             </a-card>
         </a-flex>
         <a-progress
-                :percent="getPercent(fight.fightNode.currentProgressIndex,fight.fightNode.fightProgressList?.length)"
+                :percent="getPercent(fightStore.getFight.fightNode.currentProgressIndex,fightStore.getFight.fightNode.fightProgressList?.length)"
                 :size="[800, 20]"/>
     </a-row>
     <a-row justify="space-between" align="center" style="margin: 20px">
@@ -238,7 +238,7 @@ const characterIndex = ref('1');
                                 :style="{ height: '300px' }"
                                 tab-position="left"
                         >
-                            <a-tab-pane v-for="(item,i) in fight.player.getAllList()" :key="i" :tab="`${item.name}`">
+                            <a-tab-pane v-for="(item,i) in fightStore.getFight.player.getAllList()" :key="i" :tab="`${item.name}`">
                                 <a-row>
                                     <a-col :span="6">
                                         <EquipmentCom></EquipmentCom>
@@ -294,7 +294,7 @@ const characterIndex = ref('1');
                         </a-tabs>
                     </a-tab-pane>
                     <a-tab-pane key="2" tab="背包" force-render>
-                        <div v-for="item in fight.player.playerInfo.baseEquipment" :key="item.id">
+                        <div v-for="item in fightStore.getFight.player.playerInfo.baseEquipment" :key="item.id">
                             <a-card
                                     style="width: 60px; height: 60px;margin: 5px"
                                     :bodyStyle="{ margin: '0', padding: '0' }"

@@ -1,4 +1,5 @@
 import {FightProgress} from "./FightProgress.ts";
+import {SaveFunction} from "../util/SaveUtils.ts";
 
 export interface FightNodeInterface {
     id?: string | undefined;
@@ -8,7 +9,7 @@ export interface FightNodeInterface {
     currentProgressIndex?: number;
 }
 
-export class FightNode implements FightNodeInterface {
+export class FightNode implements FightNodeInterface, SaveFunction<FightNode> {
     id: string | undefined;
     // 进度
     fightProgressList: FightProgress[] = [];
@@ -16,9 +17,9 @@ export class FightNode implements FightNodeInterface {
     currentProgressIndex: number = 0;
 
 
-    constructor(fightNodeInterface: FightNodeInterface) {
+    constructor(fightNodeInterface?: FightNodeInterface) {
         Object.assign(this, fightNodeInterface);
-        this.currentProgressIndex = fightNodeInterface.currentProgressIndex || 0;
+        this.currentProgressIndex = fightNodeInterface?.currentProgressIndex || 0;
     }
 
     getCurrentFightProgress(): FightProgress {
@@ -42,6 +43,23 @@ export class FightNode implements FightNodeInterface {
             }
         }
         return result;
+    }
+
+    doLoad(dataStr: string): FightNode {
+        return this.doLoadByObj(JSON.parse(dataStr));
+    }
+
+    doSave(): string {
+        return JSON.stringify(this);
+    }
+
+    doLoadByObj(obj: any): FightNode {
+        if (!obj) {
+            return this;
+        }
+        Object.assign(this, obj);
+        this.fightProgressList = obj.fightProgressList?.map((data: any) => new FightProgress().doLoadByObj(data));
+        return this;
     }
 
 }
