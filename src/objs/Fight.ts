@@ -15,6 +15,8 @@ export class Fight implements SaveFunction<Fight> {
         Object.assign(this, obj);
         this.player = new Player().doLoadByObj(obj.player)
         this.fightNode = new FightNode().doLoadByObj(obj.fightNode)
+        this.isFighting = false
+        this.isAutoNextRound = false
         return this;
     }
 

@@ -190,8 +190,10 @@ const characterIndex = ref('1');
         <a-col :span="4">
             <div>第{{ fightStore.getFight.round }}回合</div>
             <template v-if="fightStore.getFight.isStart">
-                <a-checkbox v-model:checked="fightStore.getFight.isAutoNextRound" @change="changeAutoNext">自动</a-checkbox>
-                <a-button :disabled="fightStore.getFight.isAutoNextRound || fightStore.getFight.isFighting" @click="clickStartFight">下一个阶段
+                <a-checkbox v-model:checked="fightStore.getFight.isAutoNextRound" @change="changeAutoNext">自动
+                </a-checkbox>
+                <a-button :disabled="fightStore.getFight.isAutoNextRound || fightStore.getFight.isFighting"
+                          @click="clickStartFight">下一个阶段
                 </a-button>
             </template>
             <template v-else>
@@ -238,7 +240,8 @@ const characterIndex = ref('1');
                                 :style="{ height: '300px' }"
                                 tab-position="left"
                         >
-                            <a-tab-pane v-for="(item,i) in fightStore.getFight.player.getAllList()" :key="i" :tab="`${item.name}`">
+                            <a-tab-pane v-for="(item,i) in fightStore.getFight.player.getAllList()" :key="i"
+                                        :tab="`${item.name}`">
                                 <a-row>
                                     <a-col :span="6">
                                         <EquipmentCom></EquipmentCom>
@@ -300,16 +303,35 @@ const characterIndex = ref('1');
                                     :bodyStyle="{ margin: '0', padding: '0' }"
                             >
                                 <div style="width: 100%; height: 60px;" class="center-content">
-                                    <a-tooltip>
+                                    <a-popover>
                                         {{ textEllipsis(item.name) }}
                                         <template #title>
-                                            <div>名称：{{ item.name }}</div>
-                                            <div>装备境界：{{ getLevelStr(item.requiredEquipmentLevel) }}</div>
-                                            <div v-if="item.attack">攻击：+{{ item.attack }}</div>
-                                            <div v-if="item.life">生命：+{{ item.life }}</div>
-                                            <div v-if="item.mana">法力：+{{ item.mana }}</div>
+                                            <a-row>
+                                                <a-col :span="11">
+                                                    <div>当前装备</div>
+                                                    <div v-if="fightStore.getFight.player.playerInfo">
+                                                        <div>名称：{{ item.name }}</div>
+                                                        <div>装备境界：{{ getLevelStr(item.requiredEquipmentLevel) }}</div>
+                                                        <div v-if="item.attack">攻击：+{{ item.attack }}</div>
+                                                        <div v-if="item.life">生命：+{{ item.life }}</div>
+                                                        <div v-if="item.mana">法力：+{{ item.mana }}</div>
+                                                    </div>
+                                                </a-col>
+                                                <a-col :span="2">
+                                                    <a-divider type="vertical"
+                                                               style="height: 100%; border-color: #7cb305" dashed/>
+                                                </a-col>
+                                                <a-col :span="11">
+                                                    <div>新装备<a-button size="small">更换</a-button></div>
+                                                    <div>名称：{{ item.name }}</div>
+                                                    <div>装备境界：{{ getLevelStr(item.requiredEquipmentLevel) }}</div>
+                                                    <div v-if="item.attack">攻击：+{{ item.attack }}</div>
+                                                    <div v-if="item.life">生命：+{{ item.life }}</div>
+                                                    <div v-if="item.mana">法力：+{{ item.mana }}</div>
+                                                </a-col>
+                                            </a-row>
                                         </template>
-                                    </a-tooltip>
+                                    </a-popover>
                                 </div>
                             </a-card>
                         </div>

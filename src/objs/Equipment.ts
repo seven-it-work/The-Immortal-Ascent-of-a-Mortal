@@ -78,7 +78,7 @@ export class Weapon extends BaseEquipment {
     type: 'WEAPON' = 'WEAPON'
     equipmentLocation: EquipmentLocation = EquipmentLocation.WEAPON;
 
-    constructor(equipmentInterface: EquipmentInterface) {
+    constructor(equipmentInterface?: EquipmentInterface) {
         super(equipmentInterface);
     }
 }
@@ -86,7 +86,7 @@ export class Weapon extends BaseEquipment {
 export class Armor extends BaseEquipment {
     type: 'ARMOR' = 'ARMOR'
 
-    constructor(equipmentInterface: EquipmentInterface) {
+    constructor(equipmentInterface?: EquipmentInterface) {
         super(equipmentInterface);
     }
 }

@@ -1,6 +1,6 @@
 import {randomUsePoint} from "../util/RandomCreateUtils.ts";
 
-import {BaseEquipment} from "./Equipment.ts";
+import {Armor, BaseEquipment, Mount, Weapon} from "./Equipment.ts";
 import {randomProbability} from "../util/ProbabilityUtils.ts";
 import {SaveFunction} from "../util/SaveUtils.ts";
 
@@ -76,6 +76,23 @@ export interface ImmortalCultivatorsInterface {
     avoid?: number;
     // 躲避计数器
     avoidCount?: number;
+    // 武器
+    weapon?:Weapon;
+    // 上装
+    clothe?:Armor;
+    // 下装
+    bottle?:Armor;
+    // 鞋子
+    shoe?:Armor;
+    // 腰带
+    belt?:Armor;
+    // 戒指
+    ring?:Armor;
+    // 项链
+    necklace?:Armor;
+    // 坐骑
+    mount?:Mount;
+
 }
 
 export class ImmortalCultivators implements ImmortalCultivatorsInterface, SaveFunction<ImmortalCultivators> {
@@ -89,6 +106,15 @@ export class ImmortalCultivators implements ImmortalCultivatorsInterface, SaveFu
         }
         Object.assign(this, obj);
         this.baseEquipment = obj.baseEquipment?.map((data: any)=> new BaseEquipment().doLoadByObj(data));
+        this.weapon=new Weapon().doLoadByObj(obj.weapon);
+        this.clothe=new Armor().doLoadByObj(obj.clothe);
+        this.bottle=new Armor().doLoadByObj(obj.bottle);
+        this.shoe=new Armor().doLoadByObj(obj.shoe);
+        this.belt=new Armor().doLoadByObj(obj.belt);
+        this.ring=new Armor().doLoadByObj(obj.ring);
+        this.necklace=new Armor().doLoadByObj(obj.necklace);
+        this.mount=new Mount().doLoadByObj(obj.mount);
+
         return this;
     }
 
@@ -114,6 +140,22 @@ export class ImmortalCultivators implements ImmortalCultivatorsInterface, SaveFu
     avoid: number = 1;
     baseEquipment: BaseEquipment[] = [];
     avoidCount: number = 0;
+    // 武器
+    weapon?:Weapon;
+    // 上装
+    clothe?:Armor;
+    // 下装
+    bottle?:Armor;
+    // 鞋子
+    shoe?:Armor;
+    // 腰带
+    belt?:Armor;
+    // 戒指
+    ring?:Armor;
+    // 项链
+    necklace?:Armor;
+    // 坐骑
+    mount?:Mount;
 
 
     /**
