@@ -11,6 +11,8 @@ import {useLogStore} from "../store/useLogStore.ts";
 import {fightNodeCreate, sleep, createEquipment} from "../util/RandomCreateUtils.ts";
 import {ref} from "vue";
 import {progressFormat, textEllipsis} from "../util/StrUtils.ts";
+import {one_classify} from "../objs/Equipment.ts";
+import EquipmentPopoverItem from "../components/equipment/EquipmentPopoverItem.vue";
 
 const fightStore = useFightStore()
 const logStore = useLogStore()
@@ -118,8 +120,8 @@ async function startFight() {
         fightStore.getFight.isFighting = false
         // 结束了 弹窗告知
         // todo 加入日志
-        // todo 这里cancel为什么没有
-        Modal.success({
+        Modal.confirm({
+            closable: true,
             title: '战斗信息',
             content: '战斗完成了',
             okText: '继续战斗',
@@ -127,6 +129,9 @@ async function startFight() {
             onOk: () => {
                 fightStore.getFight.fightNode = fightNodeCreate()
                 startFight()
+            },
+            onCancel: () => {
+                console.log("知道了")
             }
         })
         return
@@ -175,7 +180,25 @@ function clickStartFight() {
 
 
 const activeKey = ref('CharacterInformation');
-const characterIndex = ref('1');
+const characterIndex = ref(0);
+
+
+function changeEquipment(item) {
+    // 从背包移除
+    const allListElement = fightStore.getFight.player.getAllList()[characterIndex.value];
+    const oldLength = allListElement.baseEquipment.length;
+    allListElement.baseEquipment = allListElement.baseEquipment?.filter(equipment => equipment.id != item.id) || [];
+    if (oldLength !== allListElement.baseEquipment.length) {
+        const oldEquipment = allListElement[item.type];
+        allListElement[item.type] = item
+        if (oldEquipment && oldEquipment.id) {
+            // 替换的装备放入背包
+            allListElement.baseEquipment.push(oldEquipment)
+        }
+    } else {
+        // 存在错误，装备了数量还是没有减少
+    }
+}
 </script>
 
 <template>
@@ -244,7 +267,7 @@ const characterIndex = ref('1');
                                         :tab="`${item.name}`">
                                 <a-row>
                                     <a-col :span="6">
-                                        <EquipmentCom></EquipmentCom>
+                                        <EquipmentCom :immortal="item"></EquipmentCom>
                                     </a-col>
                                     <a-col :span="6">
                                         <div style="overflow: hidden;">
@@ -297,7 +320,8 @@ const characterIndex = ref('1');
                         </a-tabs>
                     </a-tab-pane>
                     <a-tab-pane key="2" tab="背包" force-render>
-                        <div v-for="item in fightStore.getFight.player.playerInfo.baseEquipment" :key="item.id">
+                        <div v-for="item in fightStore.getFight.player.getAllList()[characterIndex].baseEquipment"
+                             :key="item.id">
                             <a-card
                                     style="width: 60px; height: 60px;margin: 5px"
                                     :bodyStyle="{ margin: '0', padding: '0' }"
@@ -309,25 +333,20 @@ const characterIndex = ref('1');
                                             <a-row>
                                                 <a-col :span="11">
                                                     <div>当前装备</div>
-                                                    <div v-if="fightStore.getFight.player.playerInfo">
-                                                        <div>名称：{{ item.name }}</div>
-                                                        <div>装备境界：{{ getLevelStr(item.requiredEquipmentLevel) }}</div>
-                                                        <div v-if="item.attack">攻击：+{{ item.attack }}</div>
-                                                        <div v-if="item.life">生命：+{{ item.life }}</div>
-                                                        <div v-if="item.mana">法力：+{{ item.mana }}</div>
+                                                    <div v-if="fightStore.getFight.player.getAllList()[characterIndex][item.type]?.id">
+                                                        <EquipmentPopoverItem
+                                                                :equipment="fightStore.getFight.player.getAllList()[characterIndex][item.type]"/>
                                                     </div>
+                                                    <div v-else>无</div>
                                                 </a-col>
                                                 <a-col :span="2">
                                                     <a-divider type="vertical"
                                                                style="height: 100%; border-color: #7cb305" dashed/>
                                                 </a-col>
                                                 <a-col :span="11">
-                                                    <div>新装备<a-button size="small">更换</a-button></div>
-                                                    <div>名称：{{ item.name }}</div>
-                                                    <div>装备境界：{{ getLevelStr(item.requiredEquipmentLevel) }}</div>
-                                                    <div v-if="item.attack">攻击：+{{ item.attack }}</div>
-                                                    <div v-if="item.life">生命：+{{ item.life }}</div>
-                                                    <div v-if="item.mana">法力：+{{ item.mana }}</div>
+                                                    <div>更换装备</div>
+                                                    <EquipmentPopoverItem :equipment="item"/>
+                                                    <a-button @click="changeEquipment(item)">更换</a-button>
                                                 </a-col>
                                             </a-row>
                                         </template>

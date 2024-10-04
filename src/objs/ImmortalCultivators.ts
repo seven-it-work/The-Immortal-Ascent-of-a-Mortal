@@ -1,6 +1,6 @@
 import {randomUsePoint} from "../util/RandomCreateUtils.ts";
 
-import {Armor, BaseEquipment, Mount, Weapon} from "./Equipment.ts";
+import {BaseEquipment, Belt, Bottle, Clothe, Mount, Necklace, Ring, Shoe, Weapon} from "./Equipment.ts";
 import {randomProbability} from "../util/ProbabilityUtils.ts";
 import {SaveFunction} from "../util/SaveUtils.ts";
 
@@ -77,21 +77,21 @@ export interface ImmortalCultivatorsInterface {
     // 躲避计数器
     avoidCount?: number;
     // 武器
-    weapon?:Weapon;
+    weapon?: Weapon;
     // 上装
-    clothe?:Armor;
+    clothe?: Clothe;
     // 下装
-    bottle?:Armor;
+    bottle?: Bottle;
     // 鞋子
-    shoe?:Armor;
+    shoe?: Shoe;
     // 腰带
-    belt?:Armor;
+    belt?: Belt;
     // 戒指
-    ring?:Armor;
+    ring?: Ring;
     // 项链
-    necklace?:Armor;
+    necklace?: Necklace;
     // 坐骑
-    mount?:Mount;
+    mount?: Mount;
 
 }
 
@@ -105,15 +105,15 @@ export class ImmortalCultivators implements ImmortalCultivatorsInterface, SaveFu
             return this;
         }
         Object.assign(this, obj);
-        this.baseEquipment = obj.baseEquipment?.map((data: any)=> new BaseEquipment().doLoadByObj(data));
-        this.weapon=new Weapon().doLoadByObj(obj.weapon);
-        this.clothe=new Armor().doLoadByObj(obj.clothe);
-        this.bottle=new Armor().doLoadByObj(obj.bottle);
-        this.shoe=new Armor().doLoadByObj(obj.shoe);
-        this.belt=new Armor().doLoadByObj(obj.belt);
-        this.ring=new Armor().doLoadByObj(obj.ring);
-        this.necklace=new Armor().doLoadByObj(obj.necklace);
-        this.mount=new Mount().doLoadByObj(obj.mount);
+        this.baseEquipment = obj.baseEquipment?.map((data: any) => new BaseEquipment().doLoadByObj(data));
+        this.weapon = new Weapon().doLoadByObj(obj.weapon);
+        this.clothe = new Clothe().doLoadByObj(obj.clothe);
+        this.bottle = new Bottle().doLoadByObj(obj.bottle);
+        this.shoe = new Shoe().doLoadByObj(obj.shoe);
+        this.belt = new Belt().doLoadByObj(obj.belt);
+        this.ring = new Ring().doLoadByObj(obj.ring);
+        this.necklace = new Necklace().doLoadByObj(obj.necklace);
+        this.mount = new Mount().doLoadByObj(obj.mount);
 
         return this;
     }
@@ -141,21 +141,21 @@ export class ImmortalCultivators implements ImmortalCultivatorsInterface, SaveFu
     baseEquipment: BaseEquipment[] = [];
     avoidCount: number = 0;
     // 武器
-    weapon?:Weapon;
+    weapon?: Weapon;
     // 上装
-    clothe?:Armor;
+    clothe?: Clothe;
     // 下装
-    bottle?:Armor;
+    bottle?: Bottle;
     // 鞋子
-    shoe?:Armor;
+    shoe?: Shoe;
     // 腰带
-    belt?:Armor;
+    belt?: Belt;
     // 戒指
-    ring?:Armor;
+    ring?: Ring;
     // 项链
-    necklace?:Armor;
+    necklace?: Necklace;
     // 坐骑
-    mount?:Mount;
+    mount?: Mount;
 
 
     /**

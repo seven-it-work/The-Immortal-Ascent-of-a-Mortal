@@ -2,7 +2,7 @@ import {ImmortalCultivators, ImmortalCultivatorsInterface} from "../objs/Immorta
 import {randomUtil, uuid} from "./ProbabilityUtils.ts";
 import {FightProgress, FightProgressInterFace} from "../objs/FightProgress.ts";
 import {FightNode, FightNodeInterface} from "../objs/FightNode.ts";
-import {Armor, EquipmentInterface, EquipmentLocation, Mount, Weapon} from "../objs/Equipment.ts";
+import {Belt, Bottle, Clothe, EquipmentInterface, Mount, Necklace, Ring, Shoe, Weapon} from "../objs/Equipment.ts";
 
 
 export function createEquipment(equipmentInterface: EquipmentInterface = {}) {
@@ -12,46 +12,63 @@ export function createEquipment(equipmentInterface: EquipmentInterface = {}) {
     const level = equipmentInterface.requiredEquipmentLevel;
 
     const arrmorList = [
-        EquipmentLocation.CLOTHE,
-        EquipmentLocation.BOTTLE,
-        EquipmentLocation.SHOE,
-        EquipmentLocation.BELT,
-        EquipmentLocation.RING,
-        EquipmentLocation.NECKLACE,
+        'clothe',
+        'bottle',
+        'shoe',
+        'belt',
+        'ring',
+        'necklace',
     ]
     let enumValue = randomUtil.pickone([
-        EquipmentLocation.WEAPON,
-        EquipmentLocation.MOUNT,
+        'weapon',
+        'mount',
         ...arrmorList
     ]);
-    if (equipmentInterface.equipmentLocation !== undefined) {
-        enumValue = equipmentInterface.equipmentLocation;
+    let armor = undefined;
+    switch (enumValue) {
+        case 'weapon':
+            const weapon = new Weapon(equipmentInterface);
+            weapon.id = uuid();
+            weapon.name = "测试🗡"
+            weapon.attack = level
+            return weapon
+        case 'mount':
+            const mount = new Mount(equipmentInterface);
+            mount.id = uuid();
+            mount.name = "测试🐎"
+            // 展示不知道加什么属性
+            return mount
+        case 'clothe':
+            armor = new Clothe(equipmentInterface)
+            break
+        case 'bottle':
+            armor = new Bottle(equipmentInterface)
+            break
+        case 'shoe':
+            armor = new Shoe(equipmentInterface)
+            break
+        case 'belt':
+            armor = new Belt(equipmentInterface)
+            break
+        case 'ring':
+            armor = new Ring(equipmentInterface)
+            break
+        case 'necklace':
+            armor = new Necklace(equipmentInterface)
+            break
     }
-    equipmentInterface.equipmentLocation = enumValue
-    if (enumValue === EquipmentLocation.WEAPON) {
-        const weapon = new Weapon(equipmentInterface);
-        weapon.id = uuid();
-        weapon.name = "测试🗡"
-        weapon.attack = level
-        return weapon
-    } else if (enumValue === EquipmentLocation.MOUNT) {
-        const mount = new Mount(equipmentInterface);
-        mount.id = uuid();
-        mount.name = "测试🐎"
-        // 展示不知道加什么属性
-        return mount
-    } else {
-        // 随机生成防具信息
-        const armor = new Armor(equipmentInterface);
-        armor.id = uuid();
-        armor.name = "测试衣"
-        const points = 2 * level;
-        for (let i = 0; i < points; i++) {
-            // @ts-ignore
-            armor[randomUtil.pickone(['life', 'mana'])] += 1;
-        }
-        return armor
+    if (!armor) {
+        throw new Error("没有指定类型")
     }
+    // 随机生成防具信息
+    armor.id = uuid();
+    armor.name = "测试衣"
+    const points = 2 * level;
+    for (let i = 0; i < points; i++) {
+        // @ts-ignore
+        armor[randomUtil.pickone(['life', 'mana'])] += 1;
+    }
+    return armor
 }
 
 export async function sleep(ms: number) {
