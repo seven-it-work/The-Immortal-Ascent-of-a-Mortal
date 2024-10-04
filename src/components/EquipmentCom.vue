@@ -13,7 +13,18 @@ export default defineComponent({
         }
     },
     components: {EquipmentPopoverItem},
-    methods: {textEllipsis},
+    methods: {
+        textEllipsis,
+        unload(type) {
+            const old = this.immortal?.[type];
+            if (old) {
+                // @ts-ignore
+                this.immortal?.baseEquipment?.push(old)
+                // @ts-ignore
+                this.immortal[type] = undefined;
+            }
+        }
+    },
     props: {
         immortal: Object,
     },
@@ -36,8 +47,8 @@ export default defineComponent({
                         <template #title>
                             <a-row>
                                 <div v-if="immortal?.[item]?.id">
-                                    <EquipmentPopoverItem
-                                            :equipment="immortal?.[item]"/>
+                                    <EquipmentPopoverItem :equipment="immortal?.[item]"/>
+                                    <a-button @click="unload(item)">卸下</a-button>
                                 </div>
                                 <div v-else>无</div>
                             </a-row>

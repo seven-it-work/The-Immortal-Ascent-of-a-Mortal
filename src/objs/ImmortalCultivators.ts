@@ -95,6 +95,29 @@ export interface ImmortalCultivatorsInterface {
 
 }
 
+
+function getEquipmentValue(immortal: ImmortalCultivators, prop: 'physique' | 'soulForce' | 'strength' | 'toughness' | 'erupt' | 'blast' | 'hit' | 'avoid' | 'attack' | 'life' | 'mana'): number {
+    let equipmentValue = 0;
+    const strings = [
+        "weapon",
+        "clothe",
+        "bottle",
+        "shoe",
+        "belt",
+        "ring",
+        "necklace",
+        "mount",
+    ];
+    for (let i = 0; i < strings.length; i++) {
+        // @ts-ignore
+        const immortalElement = immortal[strings[i]];
+        if (immortalElement) {
+            equipmentValue += immortalElement[prop] || 0
+        }
+    }
+    return equipmentValue;
+}
+
 export class ImmortalCultivators implements ImmortalCultivatorsInterface, SaveFunction<ImmortalCultivators> {
     doLoad(dataStr: string): ImmortalCultivators {
         return this.doLoadByObj(JSON.parse(dataStr));
@@ -162,7 +185,21 @@ export class ImmortalCultivators implements ImmortalCultivatorsInterface, SaveFu
      * 获取暴击伤害
      */
     getCriticalDamage(): number {
-        return this.blast || 0;
+        return this.blast + getEquipmentValue(this, 'blast');
+    }
+
+    /**
+     * 获取命中率
+     */
+    getHit(): number {
+        return this.hit + getEquipmentValue(this, 'hit');
+    }
+
+    /**
+     * 获取躲避率
+     */
+    getAvoid(): number {
+        return this.avoid + getEquipmentValue(this, 'avoid');
     }
 
     /**
@@ -170,7 +207,7 @@ export class ImmortalCultivators implements ImmortalCultivatorsInterface, SaveFu
      * 爆发=暴击率
      */
     getCriticalHitProbability(): number {
-        return this.erupt;
+        return this.erupt + getEquipmentValue(this, 'erupt');
     }
 
     /**
@@ -185,11 +222,11 @@ export class ImmortalCultivators implements ImmortalCultivatorsInterface, SaveFu
      * 攻击命中率/（攻击命中率+防御躲避率）
      */
     checkIsHit(target: ImmortalCultivators): boolean {
-        const number = this.hit + target.avoidCount + target.avoid;
-        if (target.avoid <= 0) {
+        const number = this.getHit() + target.avoidCount + target.getAvoid();
+        if (target.getAvoid() <= 0) {
             return true;
         }
-        const b = randomProbability(this.hit + target.avoidCount, number);
+        const b = randomProbability(this.getHit() + target.avoidCount, number);
         if (b) {
             return true;
         } else {
@@ -202,19 +239,19 @@ export class ImmortalCultivators implements ImmortalCultivatorsInterface, SaveFu
      * 获取防御力
      */
     getDefense(): number {
-        return this.toughness || 0;
+        return this.toughness + getEquipmentValue(this, 'toughness');
     }
 
     getAttack(): number {
-        return this.strength || 0;
+        return this.strength + getEquipmentValue(this, 'strength') + getEquipmentValue(this, 'attack');
     }
 
     getMana(): number {
-        return this.soulForce || 0;
+        return this.soulForce + getEquipmentValue(this, 'soulForce') + getEquipmentValue(this, 'mana');
     }
 
     getLife(): number {
-        return this.physique || 0;
+        return this.physique + getEquipmentValue(this, 'physique') + getEquipmentValue(this, 'life');
     }
 
 

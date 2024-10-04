@@ -18,6 +18,14 @@ const equipmentProps = {
     'attack': "攻击",
     'life': "生命",
     'mana': "法力",
+    'physique': "体质",
+    'soulForce': "魂力",
+    'strength': "力量",
+    'toughness': "韧性",
+    'erupt': "爆发",
+    'blast': "爆伤",
+    'hit': "命中",
+    'avoid': "躲避",
 }
 
 </script>

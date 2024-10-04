@@ -4,6 +4,7 @@ import {ImmortalCultivators} from "../objs/ImmortalCultivators.ts";
 import {getPercent} from "../util/ProbabilityUtils.ts";
 import {progressFormat} from "../util/StrUtils.ts";
 
+// @ts-ignore
 export default defineComponent({
   name: "PeopleCom",
   methods: {progressFormat, getPercent},
