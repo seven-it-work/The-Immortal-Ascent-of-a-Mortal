@@ -13,6 +13,7 @@ import {ref} from "vue";
 import {progressFormat, textEllipsis} from "../util/StrUtils.ts";
 import {one_classify} from "../objs/Equipment.ts";
 import EquipmentPopoverItem from "../components/equipment/EquipmentPopoverItem.vue";
+import EquipmentCompare from "../components/equipment/EquipmentCompare.vue";
 
 const fightStore = useFightStore()
 const logStore = useLogStore()
@@ -184,6 +185,7 @@ const characterIndex = ref(0);
 
 
 function changeEquipment(item) {
+    console.log("触发了")
     // 从背包移除
     const allListElement = fightStore.getFight.player.getAllList()[characterIndex.value];
     const oldLength = allListElement.baseEquipment.length;
@@ -330,25 +332,11 @@ function changeEquipment(item) {
                                     <a-popover>
                                         {{ textEllipsis(item.name) }}
                                         <template #title>
-                                            <a-row>
-                                                <a-col :span="11">
-                                                    <div>当前装备</div>
-                                                    <div v-if="fightStore.getFight.player.getAllList()[characterIndex][item.type]?.id">
-                                                        <EquipmentPopoverItem
-                                                                :equipment="fightStore.getFight.player.getAllList()[characterIndex][item.type]"/>
-                                                    </div>
-                                                    <div v-else>无</div>
-                                                </a-col>
-                                                <a-col :span="2">
-                                                    <a-divider type="vertical"
-                                                               style="height: 100%; border-color: #7cb305" dashed/>
-                                                </a-col>
-                                                <a-col :span="11">
-                                                    <div>更换装备</div>
-                                                    <EquipmentPopoverItem :equipment="item"/>
-                                                    <a-button @click="changeEquipment(item)">更换</a-button>
-                                                </a-col>
-                                            </a-row>
+                                            <EquipmentCompare
+                                            :current-equipment="fightStore.getFight.player.getAllList()[characterIndex][item.type]"
+                                            :new-equipment="item"
+                                            @change-equipment="changeEquipment"
+                                            ></EquipmentCompare>
                                         </template>
                                     </a-popover>
                                 </div>
