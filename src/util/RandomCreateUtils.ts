@@ -10,7 +10,7 @@ import {
     EquipmentInterface,
     Mount,
     Necklace,
-    one_classify, quality,
+    one_classify,
     Ring,
     Shoe,
     Weapon, weapon_classify
@@ -35,10 +35,11 @@ export function createEquipment(equipmentInterface: EquipmentInterface = {}) {
             const weapon = new Weapon(equipmentInterface);
             // todo选择问题
             const kind = randomUtil.pickone(Array.from(Object.values(weapon_classify)))
-            const rarity = randomUtil.pickone(Array.from(Object.values(quality)))
+            // const rarity = randomUtil.pickone(Array.from(Object.values(quality)))
             console.log(kind)
             const name = getTalisman(10,
                 {
+                    kind:'拳'
                 });
             console.log(111,name)
             weapon.id = uuid();

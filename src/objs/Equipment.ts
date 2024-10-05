@@ -24,7 +24,10 @@ export const equipmentProps = {
     'hit': "命中",
     'avoid': "躲避",
 }
-
+const weapon_classify_more=[
+    '拳套',
+    '琴'
+]
 export const weapon_classify = {
     knife:"刀",
     sword:"剑",
@@ -37,7 +40,20 @@ export const weapon_classify = {
     crossbow:"弩",
     whip:"鞭",
 }
-
+// [
+//     "戟",
+//     "戈",
+//     "环",
+//     "钩",
+//     "刺",
+//     "爪",
+//     "针",
+//     "钉",
+//     "镖",
+//     "盾",
+//     "衣",
+//     "甲"
+// ],
 
 
 
@@ -50,6 +66,15 @@ export const  rarityNames = {
     legendary: '秘宝',
     mythic: '灵宝',
     exotic: '古宝'
+};
+export const rarityColors = {
+    common: '#CCCCCC',
+    uncommon: '#222A35',
+    rare: '#00A6A9',
+    epic: '#804DC8',
+    legendary: '#C5C660',
+    mythic: '#F28234',
+    exotic: '#C65043',
 };
 
 
