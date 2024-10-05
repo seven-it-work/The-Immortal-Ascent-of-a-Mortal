@@ -2,32 +2,45 @@ import {ImmortalCultivators, ImmortalCultivatorsInterface} from "../objs/Immorta
 import {randomUtil, uuid} from "./ProbabilityUtils.ts";
 import {FightProgress, FightProgressInterFace} from "../objs/FightProgress.ts";
 import {FightNode, FightNodeInterface} from "../objs/FightNode.ts";
-import {Belt, Bottle, Clothe, EquipmentInterface, Mount, Necklace, Ring, Shoe, Weapon} from "../objs/Equipment.ts";
+import {getTalisman} from "random_chinese_fantasy_names";
+import {
+    Belt,
+    Bottle,
+    Clothe,
+    EquipmentInterface,
+    Mount,
+    Necklace,
+    one_classify, quality,
+    Ring,
+    Shoe,
+    Weapon, weapon_classify
+} from "../objs/Equipment.ts";
 
+createEquipment({type:"weapon"})
 
 export function createEquipment(equipmentInterface: EquipmentInterface = {}) {
     if (!equipmentInterface.requiredEquipmentLevel) {
         equipmentInterface.requiredEquipmentLevel = 1;
     }
     const level = equipmentInterface.requiredEquipmentLevel;
-
-    const arrmorList = [
-        'clothe',
-        'bottle',
-        'shoe',
-        'belt',
-        'ring',
-        'necklace',
-    ]
-    let enumValue = randomUtil.pickone([
-        'weapon',
-        'mount',
-        ...arrmorList
-    ]);
+    let enumValue;
+    if (equipmentInterface.type) {
+        enumValue = equipmentInterface.type
+    } else {
+        enumValue = randomUtil.pickone(Array.from(Object.keys(one_classify)));
+    }
     let armor = undefined;
     switch (enumValue) {
         case 'weapon':
             const weapon = new Weapon(equipmentInterface);
+            // todo选择问题
+            const kind = randomUtil.pickone(Array.from(Object.values(weapon_classify)))
+            const rarity = randomUtil.pickone(Array.from(Object.values(quality)))
+            console.log(kind)
+            const name = getTalisman(10,
+                {
+                });
+            console.log(111,name)
             weapon.id = uuid();
             weapon.name = "测试🗡"
             weapon.attack = level

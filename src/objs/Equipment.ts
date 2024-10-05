@@ -11,16 +11,45 @@ export const one_classify = {
     'mount': '坐骑',
 }
 
-export const weapon_classify = {
-    sword: '剑',
-    knife: '刀',
-    violin: '琴',
-    bow: '弓',
-    whip: '鞭',
-    fist: '拳',
-    palm: '掌',
-    gun: '枪',
+export const equipmentProps = {
+    'attack': "攻击",
+    'life': "生命",
+    'mana': "法力",
+    'physique': "体质",
+    'soulForce': "魂力",
+    'strength': "力量",
+    'toughness': "韧性",
+    'erupt': "爆发",
+    'blast': "爆伤",
+    'hit': "命中",
+    'avoid': "躲避",
 }
+
+export const weapon_classify = {
+    knife:"刀",
+    sword:"剑",
+    gun:"枪",
+    stick:"棍",
+    bow:"弓",
+    spear:"矛",
+    axe:"斧",
+    hammer:"锤",
+    crossbow:"弩",
+    whip:"鞭",
+}
+
+
+
+export const quality={
+    level0:"凡品",
+    level1:"良品",
+    level2:"上品",
+    level3:"极品",
+    level4:"秘宝",
+    level5:"灵宝",
+    level6:"古宝",
+}
+
 
 
 export interface EquipmentInterface {
@@ -29,10 +58,29 @@ export interface EquipmentInterface {
     name?: string;
     // 要求装备等级
     requiredEquipmentLevel?: number;
-
+    // 攻击力（直接加成攻击力）
     attack?: number
+    // 生命值
     life?: number
+    // 法力值
     mana?: number
+    // 体质
+    physique?: number;
+    // 魂力
+    soulForce?: number;
+    // 力量
+    strength?: number;
+    // 韧性
+    toughness?: number;
+    // 爆发
+    erupt?: number;
+    // 爆伤
+    blast?: number;
+    // 命中
+    hit?: number;
+    // 躲避
+    avoid?: number;
+
 }
 
 export class BaseEquipment implements EquipmentInterface, SaveFunction<BaseEquipment> {
@@ -59,6 +107,14 @@ export class BaseEquipment implements EquipmentInterface, SaveFunction<BaseEquip
     attack: number = 0;
     life: number = 0;
     mana: number = 0;
+    physique: number = 0;
+    soulForce: number = 0;
+    strength: number = 0;
+    toughness: number = 0;
+    erupt: number = 0;
+    blast: number = 0;
+    hit: number = 0;
+    avoid: number = 0;
 
     constructor(equipmentInterface?: EquipmentInterface) {
         Object.assign(this, equipmentInterface);

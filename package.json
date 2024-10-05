@@ -16,6 +16,7 @@
     "faker": "^6.6.6",
     "lodash": "^4.17.21",
     "pinia": "^2.2.2",
+    "random_chinese_fantasy_names": "^0.1.18",
     "vue": "^3.4.37",
     "vuex": "^4.0.2"
   },

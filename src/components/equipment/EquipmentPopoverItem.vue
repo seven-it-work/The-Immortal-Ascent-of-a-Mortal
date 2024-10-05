@@ -13,25 +13,12 @@
 </template>
 
 <script setup>
-import {one_classify} from "../../objs/Equipment.ts";
+import {one_classify,equipmentProps} from "../../objs/Equipment.ts";
 import {getLevelStr} from "../../objs/ImmortalCultivators.ts";
 import { ArrowUpOutlined, ArrowDownOutlined} from '@ant-design/icons-vue';
 
 const props = defineProps(['equipment', 'compareEquipment'])
 
-const equipmentProps = {
-    'attack': "攻击",
-    'life': "生命",
-    'mana': "法力",
-    'physique': "体质",
-    'soulForce': "魂力",
-    'strength': "力量",
-    'toughness': "韧性",
-    'erupt': "爆发",
-    'blast': "爆伤",
-    'hit': "命中",
-    'avoid': "躲避",
-}
 
 const compareEquipmentProps = {}
 
@@ -46,7 +33,6 @@ const compareEquipmentProps = {}
         }
     }
 // }
-console.log(compareEquipmentProps)
 
 </script>
 
