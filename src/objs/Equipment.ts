@@ -40,16 +40,17 @@ export const weapon_classify = {
 
 
 
-export const quality={
-    level0:"凡品",
-    level1:"良品",
-    level2:"上品",
-    level3:"极品",
-    level4:"秘宝",
-    level5:"灵宝",
-    level6:"古宝",
-}
 
+
+export const  rarityNames = {
+    common: '凡品',
+    uncommon: '良品',
+    rare: '上品',
+    epic: '极品',
+    legendary: '秘宝',
+    mythic: '灵宝',
+    exotic: '古宝'
+};
 
 
 export interface EquipmentInterface {
