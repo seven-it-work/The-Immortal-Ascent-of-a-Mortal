@@ -1,5 +1,5 @@
 import {ImmortalCultivators, ImmortalCultivatorsInterface} from "../objs/ImmortalCultivators.ts";
-import {randomUtil, uuid} from "./ProbabilityUtils.ts";
+import {Probability, ProbabilitySelector, randomUtil, uuid} from "./ProbabilityUtils.ts";
 import {FightProgress, FightProgressInterFace} from "../objs/FightProgress.ts";
 import {FightNode, FightNodeInterface} from "../objs/FightNode.ts";
 import {getTalisman} from "random_chinese_fantasy_names";
@@ -61,6 +61,12 @@ function createEquipmentFactory<T extends BaseEquipment>(equipmentInterface: Equ
     return equipment;
 }
 
+function propsSetFactory<T extends BaseEquipment>(equipment: T, probabilityList: Probability<string>[]) {
+    const probabilitySelector = ProbabilitySelector(probabilityList);
+    // @ts-ignore
+    equipment[probabilitySelector] += 1;
+}
+
 
 export function createEquipment(equipmentInterface: EquipmentInterface = {}) {
     let enumValue;
@@ -76,8 +82,21 @@ export function createEquipment(equipmentInterface: EquipmentInterface = {}) {
                 weaponClassify,
                 (data) => new Weapon(data),
                 (data) => {
-                    // 属性赋值
-                    data.attack = data.points;
+                    for (let i = 0; i < data.points; i++) {
+                        propsSetFactory(data, [
+                            {data: "attack", probability: 10},
+                            {data: "life", probability: 1},
+                            {data: "mana", probability: 1},
+                            {data: "physique", probability: 1},
+                            {data: "soulForce", probability: 1},
+                            {data: "strength", probability: 10},
+                            {data: "toughness", probability: 1},
+                            {data: "erupt", probability: 4},
+                            {data: "blast", probability: 4},
+                            {data: "hit", probability: 4},
+                            {data: "avoid", probability: 1},
+                        ])
+                    }
                 });
         case 'mount':
             return createEquipmentFactory(
@@ -94,10 +113,20 @@ export function createEquipment(equipmentInterface: EquipmentInterface = {}) {
                 (data) => new Clothe(data),
                 (data) => {
                     // 随机生成防具信息
-                    const points = data.points + 2;
-                    for (let i = 0; i < points; i++) {
-                        // @ts-ignore
-                        data[randomUtil.pickone(['life', 'mana'])] += 1;
+                    for (let i = 0; i < data.points+ 2; i++) {
+                        propsSetFactory(data, [
+                            {data: "attack", probability: 1},
+                            {data: "life", probability: 10},
+                            {data: "mana", probability: 10},
+                            {data: "physique", probability: 10},
+                            {data: "soulForce", probability: 10},
+                            {data: "strength", probability: 1},
+                            {data: "toughness", probability: 10},
+                            {data: "erupt", probability: 1},
+                            {data: "blast", probability: 1},
+                            {data: "hit", probability: 1},
+                            {data: "avoid", probability: 5},
+                        ])
                     }
                 });
         case 'bottle':
@@ -106,7 +135,21 @@ export function createEquipment(equipmentInterface: EquipmentInterface = {}) {
                 ['裤'],
                 (data) => new Bottle(data),
                 (data) => {
-
+                    for (let i = 0; i < data.points; i++) {
+                        propsSetFactory(data, [
+                            {data: "attack", probability: 1},
+                            {data: "life", probability: 10},
+                            {data: "mana", probability: 10},
+                            {data: "physique", probability: 10},
+                            {data: "soulForce", probability: 10},
+                            {data: "strength", probability: 1},
+                            {data: "toughness", probability: 10},
+                            {data: "erupt", probability: 1},
+                            {data: "blast", probability: 1},
+                            {data: "hit", probability: 1},
+                            {data: "avoid", probability: 5},
+                        ])
+                    }
                 });
         case 'shoe':
             return createEquipmentFactory(
@@ -114,6 +157,21 @@ export function createEquipment(equipmentInterface: EquipmentInterface = {}) {
                 ['靴', '鞋'],
                 (data) => new Shoe(data),
                 (data) => {
+                    for (let i = 0; i < data.points; i++) {
+                        propsSetFactory(data, [
+                            {data: "attack", probability: 1},
+                            {data: "life", probability: 1},
+                            {data: "mana", probability: 1},
+                            {data: "physique", probability: 1},
+                            {data: "soulForce", probability: 1},
+                            {data: "strength", probability: 1},
+                            {data: "toughness", probability: 1},
+                            {data: "erupt", probability: 1},
+                            {data: "blast", probability: 1},
+                            {data: "hit", probability: 1},
+                            {data: "avoid", probability: 1},
+                        ])
+                    }
                 });
         case 'belt':
             return createEquipmentFactory(
@@ -121,6 +179,21 @@ export function createEquipment(equipmentInterface: EquipmentInterface = {}) {
                 ['腰带', '腰佩'],
                 (data) => new Belt(data),
                 (data) => {
+                    for (let i = 0; i < data.points; i++) {
+                        propsSetFactory(data, [
+                            {data: "attack", probability: 2},
+                            {data: "life", probability: 1},
+                            {data: "mana", probability: 2},
+                            {data: "physique", probability: 1},
+                            {data: "soulForce", probability: 2},
+                            {data: "strength", probability: 1},
+                            {data: "toughness", probability: 2},
+                            {data: "erupt", probability: 1},
+                            {data: "blast", probability: 2},
+                            {data: "hit", probability: 1},
+                            {data: "avoid", probability: 2},
+                        ])
+                    }
                 });
         case 'ring':
             return createEquipmentFactory(
@@ -128,6 +201,21 @@ export function createEquipment(equipmentInterface: EquipmentInterface = {}) {
                 ['戒', '镯'],
                 (data) => new Ring(data),
                 (data) => {
+                    for (let i = 0; i < data.points; i++) {
+                        propsSetFactory(data, [
+                            {data: "attack", probability: 1},
+                            {data: "life", probability: 2},
+                            {data: "mana", probability: 1},
+                            {data: "physique", probability: 2},
+                            {data: "soulForce", probability: 1},
+                            {data: "strength", probability: 2},
+                            {data: "toughness", probability: 1},
+                            {data: "erupt", probability: 2},
+                            {data: "blast", probability: 1},
+                            {data: "hit", probability: 2},
+                            {data: "avoid", probability: 1},
+                        ])
+                    }
                 });
         case 'necklace':
             return createEquipmentFactory(
@@ -135,6 +223,21 @@ export function createEquipment(equipmentInterface: EquipmentInterface = {}) {
                 ['珠', '链', '铃'],
                 (data) => new Necklace(data),
                 (data) => {
+                    for (let i = 0; i < data.points; i++) {
+                        propsSetFactory(data, [
+                            {data: "attack", probability: 1},
+                            {data: "life", probability: 1},
+                            {data: "mana", probability: 1},
+                            {data: "physique", probability: 1},
+                            {data: "soulForce", probability: 1},
+                            {data: "strength", probability: 1},
+                            {data: "toughness", probability: 1},
+                            {data: "erupt", probability: 1},
+                            {data: "blast", probability: 1},
+                            {data: "hit", probability: 1},
+                            {data: "avoid", probability: 1},
+                        ])
+                    }
                 });
         default:
             throw new Error("没有指定类型")

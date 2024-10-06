@@ -25,3 +25,27 @@ export const getPercent = (fenZi: number | undefined, fenMu: number | undefined,
     }
     return Number.parseInt((fenZi / fenMu * 100).toFixed(numberSize))
 }
+
+export const ProbabilitySelector = <T>(probabilityList: Probability<T>[]): T => {
+    // 求和
+    if (probabilityList.length <= 0) {
+        throw new Error("错误概率选择器")
+    }
+    let sum = 0;
+    probabilityList.forEach(data => sum += data.probability)
+    const integer = randomUtil.integer({min: 1, max: sum});
+    let temp = 0;
+    for (let i = 0; i < probabilityList.length; i++) {
+        const probabilityListElement = probabilityList[i];
+        temp += probabilityListElement.probability;
+        if (integer <= temp) {
+            return probabilityListElement.data;
+        }
+    }
+    throw new Error("错误概率选择器")
+}
+
+export interface Probability<T> {
+    data: T;
+    probability: number;
+}
