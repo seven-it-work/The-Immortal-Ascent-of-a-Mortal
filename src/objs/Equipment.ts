@@ -24,22 +24,20 @@ export const equipmentProps = {
     'hit': "命中",
     'avoid': "躲避",
 }
-const weapon_classify_more=[
+export const weaponClassify: string[] = [
+    "刀",
+    "剑",
+    "枪",
+    "棍",
+    "弓",
+    "矛",
+    "斧",
+    "锤",
+    "弩",
+    "鞭",
     '拳套',
     '琴'
 ]
-export const weapon_classify = {
-    knife:"刀",
-    sword:"剑",
-    gun:"枪",
-    stick:"棍",
-    bow:"弓",
-    spear:"矛",
-    axe:"斧",
-    hammer:"锤",
-    crossbow:"弩",
-    whip:"鞭",
-}
 // [
 //     "戟",
 //     "戈",
@@ -51,14 +49,19 @@ export const weapon_classify = {
 //     "钉",
 //     "镖",
 //     "盾",
-//     "衣",
-//     "甲"
+
 // ],
 
 
+export const mountClassify: string[] = ["舟", "车", "马", "驹", "龙", "虎", "鹤"]
+
+export const clothClassify: any = [
+    "衣",
+    "甲"
+]
 
 
-export const  rarityNames = {
+export const rarityNames: any = {
     common: '凡品',
     uncommon: '良品',
     rare: '上品',
@@ -67,7 +70,18 @@ export const  rarityNames = {
     mythic: '灵宝',
     exotic: '古宝'
 };
-export const rarityColors = {
+export const rarityMorePoint: any = {
+    common: 1,
+    uncommon: 2,
+    rare: 3,
+    epic: 4,
+    legendary: 5,
+    mythic: 6,
+    exotic: 7
+};
+
+const rarityColors: any = {
+    default: '#000000',
     common: '#CCCCCC',
     uncommon: '#222A35',
     rare: '#00A6A9',
@@ -80,6 +94,10 @@ export const rarityColors = {
 
 export interface EquipmentInterface {
     type?: 'weapon' | 'clothe' | 'bottle' | 'shoe' | 'belt' | 'ring' | 'necklace' | 'mount';
+    // 二级分类
+    type2?: string;
+    // 稀有度
+    rarity?: string;
     id?: string;
     name?: string;
     // 要求装备等级
@@ -106,6 +124,8 @@ export interface EquipmentInterface {
     hit?: number;
     // 躲避
     avoid?: number;
+    // 属性点数
+    points?: number;
 
 }
 
@@ -126,7 +146,18 @@ export class BaseEquipment implements EquipmentInterface, SaveFunction<BaseEquip
         return JSON.stringify(this);
     }
 
+    /**
+     * 获取稀有度颜色
+     */
+    getRarityColors(): string {
+        return rarityColors[this.rarity || 'default']
+    }
+
     type?: 'weapon' | 'clothe' | 'bottle' | 'shoe' | 'belt' | 'ring' | 'necklace' | 'mount';
+    // 二级分类
+    type2?: string;
+    // 稀有度
+    rarity?: string;
     id?: string;
     name?: string;
     requiredEquipmentLevel?: number;
@@ -141,6 +172,7 @@ export class BaseEquipment implements EquipmentInterface, SaveFunction<BaseEquip
     blast: number = 0;
     hit: number = 0;
     avoid: number = 0;
+    points: number = 0;
 
     constructor(equipmentInterface?: EquipmentInterface) {
         Object.assign(this, equipmentInterface);

@@ -4,85 +4,143 @@ import {FightProgress, FightProgressInterFace} from "../objs/FightProgress.ts";
 import {FightNode, FightNodeInterface} from "../objs/FightNode.ts";
 import {getTalisman} from "random_chinese_fantasy_names";
 import {
+    BaseEquipment,
     Belt,
-    Bottle,
+    Bottle, clothClassify,
     Clothe,
     EquipmentInterface,
-    Mount,
+    Mount, mountClassify,
     Necklace,
-    one_classify,
+    one_classify, rarityMorePoint, rarityNames,
     Ring,
     Shoe,
-    Weapon, weapon_classify
+    Weapon, weaponClassify
 } from "../objs/Equipment.ts";
 
-createEquipment({type:"weapon"})
+console.log(1, createEquipment({type: "belt"}));
 
-export function createEquipment(equipmentInterface: EquipmentInterface = {}) {
+function equipmentPropsInit(equipmentInterface: EquipmentInterface, kindList: string[]) {
+    // 装备属性基础点数
+    const basePoints = 1
+    // 公有设值
+    if (!equipmentInterface.rarity) {
+        equipmentInterface.rarity = randomUtil.pickone(Array.from(Object.keys(rarityNames)));
+    }
     if (!equipmentInterface.requiredEquipmentLevel) {
         equipmentInterface.requiredEquipmentLevel = 1;
     }
-    const level = equipmentInterface.requiredEquipmentLevel;
+    if (!equipmentInterface.type2) {
+        equipmentInterface.type2 = randomUtil.pickone(kindList)
+    }
+    // 设置属性点数
+    equipmentInterface.points = equipmentInterface.requiredEquipmentLevel * basePoints * randomUtil.integer({
+        min: 1,
+        max: rarityMorePoint[equipmentInterface.rarity]
+    })
+}
+
+function commonSet<T extends BaseEquipment>(equipmentInterface: EquipmentInterface, t: T): T {
+    const talisman = getTalisman(10,
+        {
+            kind: equipmentInterface.type2,
+            rarity: equipmentInterface.rarity,
+            postfix: ''
+        });
+    t.id = uuid();
+    t.name = randomUtil.pickone(talisman).name
+    return t;
+}
+
+function createEquipmentFactory<T extends BaseEquipment>(equipmentInterface: EquipmentInterface,
+                                                         kindList: string[],
+                                                         newBaseEquipment: (equipmentInterface: EquipmentInterface) => T,
+                                                         afterFunction: (equipment: T) => void = () => {
+                                                         }): T {
+    equipmentPropsInit(equipmentInterface, kindList);
+    const equipment = commonSet(equipmentInterface, newBaseEquipment(equipmentInterface));
+    afterFunction(equipment)
+    return equipment;
+}
+
+
+export function createEquipment(equipmentInterface: EquipmentInterface = {}) {
     let enumValue;
     if (equipmentInterface.type) {
         enumValue = equipmentInterface.type
     } else {
         enumValue = randomUtil.pickone(Array.from(Object.keys(one_classify)));
     }
-    let armor = undefined;
     switch (enumValue) {
         case 'weapon':
-            const weapon = new Weapon(equipmentInterface);
-            // todo选择问题
-            const kind = randomUtil.pickone(Array.from(Object.values(weapon_classify)))
-            // const rarity = randomUtil.pickone(Array.from(Object.values(quality)))
-            console.log(kind)
-            const name = getTalisman(10,
-                {
-                    kind:'拳'
+            return createEquipmentFactory(
+                equipmentInterface,
+                weaponClassify,
+                (data) => new Weapon(data),
+                (data) => {
+                    // 属性赋值
+                    data.attack = data.points;
                 });
-            console.log(111,name)
-            weapon.id = uuid();
-            weapon.name = "测试🗡"
-            weapon.attack = level
-            return weapon
         case 'mount':
-            const mount = new Mount(equipmentInterface);
-            mount.id = uuid();
-            mount.name = "测试🐎"
-            // 展示不知道加什么属性
-            return mount
+            return createEquipmentFactory(
+                equipmentInterface,
+                mountClassify,
+                (data) => new Mount(data),
+                (data) => {
+                    // 展示不知道加什么属性
+                });
         case 'clothe':
-            armor = new Clothe(equipmentInterface)
-            break
+            return createEquipmentFactory(
+                equipmentInterface,
+                clothClassify,
+                (data) => new Clothe(data),
+                (data) => {
+                    // 随机生成防具信息
+                    const points = data.points + 2;
+                    for (let i = 0; i < points; i++) {
+                        // @ts-ignore
+                        data[randomUtil.pickone(['life', 'mana'])] += 1;
+                    }
+                });
         case 'bottle':
-            armor = new Bottle(equipmentInterface)
-            break
+            return createEquipmentFactory(
+                equipmentInterface,
+                ['裤'],
+                (data) => new Bottle(data),
+                (data) => {
+
+                });
         case 'shoe':
-            armor = new Shoe(equipmentInterface)
-            break
+            return createEquipmentFactory(
+                equipmentInterface,
+                ['靴', '鞋'],
+                (data) => new Shoe(data),
+                (data) => {
+                });
         case 'belt':
-            armor = new Belt(equipmentInterface)
-            break
+            return createEquipmentFactory(
+                equipmentInterface,
+                ['腰带', '腰佩'],
+                (data) => new Belt(data),
+                (data) => {
+                });
         case 'ring':
-            armor = new Ring(equipmentInterface)
-            break
+            return createEquipmentFactory(
+                equipmentInterface,
+                ['戒', '镯'],
+                (data) => new Ring(data),
+                (data) => {
+                });
         case 'necklace':
-            armor = new Necklace(equipmentInterface)
-            break
+            return createEquipmentFactory(
+                equipmentInterface,
+                ['珠', '链', '铃'],
+                (data) => new Necklace(data),
+                (data) => {
+                });
+        default:
+            throw new Error("没有指定类型")
     }
-    if (!armor) {
-        throw new Error("没有指定类型")
-    }
-    // 随机生成防具信息
-    armor.id = uuid();
-    armor.name = "测试衣"
-    const points = 2 * level;
-    for (let i = 0; i < points; i++) {
-        // @ts-ignore
-        armor[randomUtil.pickone(['life', 'mana'])] += 1;
-    }
-    return armor
+
 }
 
 export async function sleep(ms: number) {

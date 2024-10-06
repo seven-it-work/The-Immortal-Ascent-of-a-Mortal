@@ -121,20 +121,27 @@ async function startFight() {
         fightStore.getFight.isFighting = false
         // 结束了 弹窗告知
         // todo 加入日志
-        Modal.confirm({
-            closable: true,
-            title: '战斗信息',
-            content: '战斗完成了',
-            okText: '继续战斗',
-            cancelText: '知道了',
-            onOk: () => {
-                fightStore.getFight.fightNode = fightNodeCreate()
-                startFight()
-            },
-            onCancel: () => {
-                console.log("知道了")
-            }
-        })
+        // todo 这里可以加入3秒等待，等待完成后，自动点击ok按钮
+        if (fightStore.getFight.isAutoNextRound) {
+            // 继续运行
+            fightStore.getFight.fightNode = fightNodeCreate()
+            startFight()
+        }else {
+            Modal.confirm({
+                closable: true,
+                title: '战斗信息',
+                content: '战斗完成了',
+                okText: '继续战斗',
+                cancelText: '知道了',
+                onOk: () => {
+                    fightStore.getFight.fightNode = fightNodeCreate()
+                    startFight()
+                },
+                onCancel: () => {
+                    console.log("知道了")
+                }
+            })
+        }
         return
     }
     const type = await doFight();
