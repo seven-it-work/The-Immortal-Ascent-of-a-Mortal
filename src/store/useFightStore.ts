@@ -11,7 +11,6 @@ export const useFightStore = defineStore('fight', {
     state: (): State => ({}),
     actions: {
         init(fight: Fight) {
-            console.log(fight)
             this.fight = fight;
         },
     },

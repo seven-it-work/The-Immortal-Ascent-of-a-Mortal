@@ -17,7 +17,6 @@ import {
     Weapon, weaponClassify
 } from "../objs/Equipment.ts";
 
-console.log(1, createEquipment({type: "belt"}));
 
 function equipmentPropsInit(equipmentInterface: EquipmentInterface, kindList: string[]) {
     // 装备属性基础点数

@@ -36,7 +36,6 @@ for (let i = 0; i < jj2.length; i++) {
         levelAndMark.push(`${jj2[i]}第${j + 1}重`)
     }
 }
-console.log(levelAndMark)
 
 export class Skill {
     name: string;
