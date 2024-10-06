@@ -121,7 +121,7 @@ async function startFight() {
         fightStore.getFight.isFighting = false
         // 结束了 弹窗告知
         // todo 加入日志
-        // todo 这里可以加入3秒等待，等待完成后，自动点击ok按钮
+        // todo 这里可以加入3秒等待，等待完成后，自动点击ok按钮，这里还可能存在栈溢出问题
         if (fightStore.getFight.isAutoNextRound) {
             // 继续运行
             fightStore.getFight.fightNode = fightNodeCreate()
