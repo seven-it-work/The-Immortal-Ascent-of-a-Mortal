@@ -98,7 +98,7 @@ export interface ImmortalCultivatorsInterface {
 }
 
 
-function getEquipmentValue(immortal: ImmortalCultivators, prop: 'physique' | 'soulForce' | 'strength' | 'toughness' | 'erupt' | 'blast' | 'hit' | 'avoid' | 'attack' | 'life' | 'mana'): number {
+function getEquipmentValue(immortal: ImmortalCultivators, prop: 'physique' | 'soulForce' | 'strength' | 'toughness' | 'erupt' | 'blast' | 'hit' | 'avoid' | 'attack' | 'life' | 'mana'|'backpackCapacity'): number {
     let equipmentValue = 0;
     const strings = [
         "weapon",
@@ -165,7 +165,7 @@ export class ImmortalCultivators implements ImmortalCultivatorsInterface, SaveFu
     avoid: number = 1;
     baseEquipment: BaseEquipment[] = [];
     // 背包最大数量
-    backpackCapacity: number = 10;
+    backpackCapacity: number = 5;
     avoidCount: number = 0;
     // 武器
     weapon?: Weapon;
@@ -188,7 +188,11 @@ export class ImmortalCultivators implements ImmortalCultivatorsInterface, SaveFu
      * 是否超重
      */
     isOverweight(): boolean {
-        return this.baseEquipment.length >= this.backpackCapacity;
+        return this.baseEquipment.length >= this.getBackpackCapacity();
+    }
+
+    getBackpackCapacity():number{
+        return this.backpackCapacity+ getEquipmentValue(this, 'backpackCapacity');
     }
 
 

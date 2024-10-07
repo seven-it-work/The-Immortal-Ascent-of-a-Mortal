@@ -23,6 +23,7 @@ export const equipmentProps = {
     'blast': "爆伤",
     'hit': "命中",
     'avoid': "躲避",
+    'backpackCapacity': "背包上限",
 }
 export const weaponClassify: string[] = [
     "刀",
@@ -124,6 +125,8 @@ export interface EquipmentInterface {
     hit?: number;
     // 躲避
     avoid?: number;
+    // 背包上限
+    backpackCapacity?: number;
     // 属性点数
     points?: number;
 
@@ -172,6 +175,7 @@ export class BaseEquipment implements EquipmentInterface, SaveFunction<BaseEquip
     blast: number = 0;
     hit: number = 0;
     avoid: number = 0;
+    backpackCapacity: number=0;
     points: number = 0;
 
     constructor(equipmentInterface?: EquipmentInterface) {

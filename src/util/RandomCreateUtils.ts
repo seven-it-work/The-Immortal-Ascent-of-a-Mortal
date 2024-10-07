@@ -104,7 +104,22 @@ export function createEquipment(equipmentInterface: EquipmentInterface = {}) {
                 mountClassify,
                 (data) => new Mount(data),
                 (data) => {
-                    // 展示不知道加什么属性
+                    for (let i = 0; i < data.points; i++) {
+                        propsSetFactory(data, [
+                            {data: "attack", probability: 1},
+                            {data: "life", probability: 1},
+                            {data: "mana", probability: 1},
+                            {data: "physique", probability: 1},
+                            {data: "soulForce", probability: 1},
+                            {data: "strength", probability: 1},
+                            {data: "toughness", probability: 1},
+                            {data: "erupt", probability: 1},
+                            {data: "blast", probability: 1},
+                            {data: "hit", probability: 1},
+                            {data: "avoid", probability: 1},
+                            {data: "backpackCapacity", probability: 18},
+                        ])
+                    }
                 });
         case 'clothe':
             return createEquipmentFactory(

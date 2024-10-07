@@ -41,7 +41,7 @@ async function doFight(): Promise<string> {
             if (sEnemy.length == 0) {
                 // 战斗结束，胜利
                 // 物品掉落 todo 根据怪物等级掉落，稀有度需要重新设定，目前小怪能掉落高稀有度物品不合理
-                const equipment = createEquipment({requiredEquipmentLevel:fightStore.getFight.player.playerInfo.level});
+                const equipment = createEquipment({requiredEquipmentLevel:fightStore.getFight.player.playerInfo.level,type:"mount"});
                 fightStore.getFight.player.playerInfo.addEquipment(equipment)
                 return "胜利了"
             }
@@ -356,7 +356,7 @@ function dropEquipment(item) {
                                     </div>
                                 </a-card>
                             </a-col>
-                            <a-col v-for="item in fightStore.getFight.player.getAllList()[characterIndex].backpackCapacity-fightStore.getFight.player.getAllList()[characterIndex].baseEquipment.length"
+                            <a-col v-for="item in fightStore.getFight.player.getAllList()[characterIndex].getBackpackCapacity()-fightStore.getFight.player.getAllList()[characterIndex].baseEquipment.length"
                                    :key="item">
                                 <a-card
                                     style="width: 60px; height: 60px;margin: 5px"

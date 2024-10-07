@@ -2,7 +2,10 @@
 import {defineComponent} from 'vue'
 import {textEllipsis} from "../util/StrUtils.ts";
 import EquipmentPopoverItem from "./equipment/EquipmentPopoverItem.vue";
-import {one_classify} from "../objs/Equipment.ts";
+import {BaseEquipment, one_classify} from "../objs/Equipment.ts";
+import {PropType} from "vue/dist/vue";
+import {ImmortalCultivators} from "../objs/ImmortalCultivators.ts";
+import {message} from "ant-design-vue";
 
 // @ts-ignore
 export default defineComponent({
@@ -16,8 +19,20 @@ export default defineComponent({
     methods: {
         textEllipsis,
         unload(type) {
-            const old = this.immortal?.[type];
+            const old: BaseEquipment = this.immortal?.[type];
             if (old) {
+                // 如果背包满了，无法卸下，提示背包满了，请清理背包再卸下
+                if (this.immortal?.isOverweight()) {
+                    message.error("背包满了，请先清理背包再卸下!")
+                    return
+                }
+                if (old.backpackCapacity > 0) {
+                    if (this.immortal?.baseEquipment.length >= this.immortal?.getBackpackCapacity() - old.backpackCapacity) {
+                        message.error("卸载后，背包容量变小，无法放入卸载物品，请先清理背包再卸下!")
+                        return;
+                    }
+                }
+                // 如果是坐骑那么需要判断，当前old的背包容量是否可能导致背包满载
                 // @ts-ignore
                 this.immortal?.baseEquipment?.push(old)
                 // @ts-ignore
@@ -26,7 +41,9 @@ export default defineComponent({
         }
     },
     props: {
-        immortal: Object,
+        immortal: {
+            type: Object as PropType<ImmortalCultivators>
+        },
     },
     data() {
     },

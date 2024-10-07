@@ -1,7 +1,7 @@
 <template>
     <a-row>
         <a-col :span="11">
-            <div>当前穿戴</div>
+            <div>更换装备</div>
             <EquipmentPopoverItem :equipment="newEquipment" :compare-equipment="currentEquipment"/>
         </a-col>
         <a-col :span="2">
@@ -9,7 +9,7 @@
                        style="height: 100%; border-color: #7cb305" dashed/>
         </a-col>
         <a-col :span="11">
-            <div>更换装备</div>
+            <div>当前穿戴</div>
             <div v-if="currentEquipment?.id">
                 <EquipmentPopoverItem :equipment="currentEquipment" :compare-equipment="newEquipment"/>
             </div>
