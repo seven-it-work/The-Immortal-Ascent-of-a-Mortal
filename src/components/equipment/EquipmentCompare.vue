@@ -1,11 +1,8 @@
 <template>
     <a-row>
         <a-col :span="11">
-            <div>当前装备</div>
-            <div v-if="currentEquipment?.id">
-                <EquipmentPopoverItem :equipment="currentEquipment" :compare-equipment="newEquipment"/>
-            </div>
-            <div v-else>无</div>
+            <div>当前穿戴</div>
+            <EquipmentPopoverItem :equipment="newEquipment" :compare-equipment="currentEquipment"/>
         </a-col>
         <a-col :span="2">
             <a-divider type="vertical"
@@ -13,8 +10,10 @@
         </a-col>
         <a-col :span="11">
             <div>更换装备</div>
-            <EquipmentPopoverItem :equipment="newEquipment" :compare-equipment="currentEquipment"/>
-            <a-button @click="changeEquipment">更换</a-button>
+            <div v-if="currentEquipment?.id">
+                <EquipmentPopoverItem :equipment="currentEquipment" :compare-equipment="newEquipment"/>
+            </div>
+            <div v-else>无</div>
         </a-col>
     </a-row>
 </template>
@@ -24,7 +23,6 @@ import EquipmentPopoverItem from "./EquipmentPopoverItem.vue";
 import {BaseEquipment} from "../../objs/Equipment.ts";
 
 export default {
-    emits: ['changeEquipment'],
     name: "EquipmentCompare",
     components: {EquipmentPopoverItem},
     props: {
@@ -36,9 +34,7 @@ export default {
         },
     },
     methods: {
-        changeEquipment(){
-            this.$emit('changeEquipment', this.newEquipment);
-        }
+
     },
 }
 </script>

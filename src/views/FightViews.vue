@@ -42,7 +42,7 @@ async function doFight(): Promise<string> {
                 // 战斗结束，胜利
                 // 物品掉落 todo 根据怪物等级掉落，稀有度需要重新设定，目前小怪能掉落高稀有度物品不合理
                 const equipment = createEquipment({requiredEquipmentLevel:fightStore.getFight.player.playerInfo.level});
-                fightStore.getFight.player.playerInfo.baseEquipment.push(equipment)
+                fightStore.getFight.player.playerInfo.addEquipment(equipment)
                 return "胜利了"
             }
             if (isPlayer) {
@@ -192,7 +192,6 @@ const characterIndex = ref(0);
 
 
 function changeEquipment(item) {
-    console.log("触发了")
     // 从背包移除
     const allListElement = fightStore.getFight.player.getAllList()[characterIndex.value];
     const oldLength = allListElement.baseEquipment.length;
@@ -202,11 +201,16 @@ function changeEquipment(item) {
         allListElement[item.type] = item
         if (oldEquipment && oldEquipment.id) {
             // 替换的装备放入背包
-            allListElement.baseEquipment.push(oldEquipment)
+            allListElement.addEquipment(oldEquipment)
         }
     } else {
         // 存在错误，装备了数量还是没有减少
     }
+}
+function dropEquipment(item) {
+    // 从背包移除
+    const allListElement = fightStore.getFight.player.getAllList()[characterIndex.value];
+    allListElement.baseEquipment = allListElement.baseEquipment?.filter(equipment => equipment.id != item.id) || [];
 }
 </script>
 
@@ -264,7 +268,7 @@ function changeEquipment(item) {
         </a-col>
         <a-col :span="13">
             <!--      个人信息-->
-            <div style="border:1px solid #40a9ff;border-radius: 6px;height: 400px;padding: 10px">
+            <div style="border:1px solid #40a9ff;border-radius: 6px;height: 400px;padding: 10px;overflow-y: scroll">
                 <a-tabs v-model:activeKey="activeKey" type="card">
                     <a-tab-pane key="CharacterInformation" tab="人物信息">
                         <a-tabs
@@ -317,8 +321,8 @@ function changeEquipment(item) {
                                             <a-col :span="12">防御力：{{ item.getDefense() }}</a-col>
                                             <a-col :span="12">暴击率：{{ item.getCriticalHitProbability() }}</a-col>
                                             <a-col :span="12">暴伤：{{ item.getCriticalDamage() }}</a-col>
-                                            <a-col :span="12">命中：{{ item.hit }}</a-col>
-                                            <a-col :span="12">躲避：{{ item.avoid }}</a-col>
+                                            <a-col :span="12">命中：{{ item.getHit() }}</a-col>
+                                            <a-col :span="12">躲避：{{ item.getAvoid() }}</a-col>
                                         </a-row>
                                     </a-col>
                                     <a-col :span="6">
@@ -329,26 +333,41 @@ function changeEquipment(item) {
                         </a-tabs>
                     </a-tab-pane>
                     <a-tab-pane key="2" tab="背包" force-render>
-                        <div v-for="item in fightStore.getFight.player.getAllList()[characterIndex].baseEquipment"
-                             :key="item.id">
-                            <a-card
+                        <a-row>
+                            <a-col v-for="item in fightStore.getFight.player.getAllList()[characterIndex].baseEquipment"
+                                   :key="item.id">
+                                <a-card
                                     style="width: 60px; height: 60px;margin: 5px"
-                                    :bodyStyle="{ margin: '0', padding: '0' }"
-                            >
-                                <div style="width: 100%; height: 60px;" class="center-content">
-                                    <a-popover>
-                                        {{ textEllipsis(item.name) }}
-                                        <template #title>
-                                            <EquipmentCompare
-                                            :current-equipment="fightStore.getFight.player.getAllList()[characterIndex][item.type]"
-                                            :new-equipment="item"
-                                            @change-equipment="changeEquipment"
-                                            ></EquipmentCompare>
-                                        </template>
-                                    </a-popover>
-                                </div>
-                            </a-card>
-                        </div>
+                                    :bodyStyle="{ margin: '0', padding: '0',border:'#1a1a1a 1px solid',borderRadius: '5px' }"
+                                >
+                                    <div style="width: 100%; height: 60px;" class="center-content">
+                                        <a-popover>
+                                            {{ textEllipsis(item.name) }}
+                                            <template #title>
+                                                <EquipmentCompare
+                                                    :current-equipment="fightStore.getFight.player.getAllList()[characterIndex][item.type]"
+                                                    :new-equipment="item"
+                                                    @change-equipment="changeEquipment"
+                                                ></EquipmentCompare>
+                                                <a-button @click="changeEquipment(item)" style="margin: 2px">更换</a-button>
+                                                <a-button @click="dropEquipment(item)" danger  style="margin: 2px">丢弃</a-button>
+                                            </template>
+                                        </a-popover>
+                                    </div>
+                                </a-card>
+                            </a-col>
+                            <a-col v-for="item in fightStore.getFight.player.getAllList()[characterIndex].backpackCapacity-fightStore.getFight.player.getAllList()[characterIndex].baseEquipment.length"
+                                   :key="item">
+                                <a-card
+                                    style="width: 60px; height: 60px;margin: 5px"
+                                    :bodyStyle="{ margin: '0', padding: '0',border:'#1a1a1a 1px solid',borderRadius: '5px' }"
+                                >
+                                    <div style="width: 100%; height: 60px;" class="center-content">
+
+                                    </div>
+                                </a-card>
+                            </a-col>
+                        </a-row>
                     </a-tab-pane>
                 </a-tabs>
             </div>

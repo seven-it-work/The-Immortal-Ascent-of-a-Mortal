@@ -62,8 +62,10 @@ export interface ImmortalCultivatorsInterface {
     usedPoints?: number;
     // 当前灵力
     currentLinLi?: number;
-    // 背包
+    // 背包（已经存入的物品）
     baseEquipment?: BaseEquipment[];
+    // 背包最大数量
+    backpackCapacity?: number;
     // 韧性 1韧性=1点防御
     toughness?: number;
     // 爆发 爆发*0.01=暴击率
@@ -162,6 +164,8 @@ export class ImmortalCultivators implements ImmortalCultivatorsInterface, SaveFu
     hit: number = 1;
     avoid: number = 1;
     baseEquipment: BaseEquipment[] = [];
+    // 背包最大数量
+    backpackCapacity: number = 10;
     avoidCount: number = 0;
     // 武器
     weapon?: Weapon;
@@ -179,6 +183,13 @@ export class ImmortalCultivators implements ImmortalCultivatorsInterface, SaveFu
     necklace?: Necklace;
     // 坐骑
     mount?: Mount;
+
+    /**
+     * 是否超重
+     */
+    isOverweight(): boolean {
+        return this.baseEquipment.length >= this.backpackCapacity;
+    }
 
 
     /**
@@ -290,6 +301,22 @@ export class ImmortalCultivators implements ImmortalCultivatorsInterface, SaveFu
             // 突破的点数随机加（玩家也是如此）
             const number = this.getMaxRemainingPoints() - this.usedPoints;
             randomUsePoint(number, this);
+        }
+    }
+
+    /**
+     * 放入物品到背包中
+     * @param oldEquipment
+     */
+    addEquipment(oldEquipment: BaseEquipment) {
+        if (!oldEquipment) {
+            return
+        }
+        if (this.isOverweight()) {
+            // 超重了
+            console.log("超重了")
+        } else {
+            this.baseEquipment.push(oldEquipment)
         }
     }
 }
