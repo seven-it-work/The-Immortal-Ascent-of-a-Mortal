@@ -1,8 +1,9 @@
 import {randomUsePoint} from "../util/RandomCreateUtils.ts";
 
 import {BaseEquipment, Belt, Bottle, Clothe, Mount, Necklace, Ring, Shoe, Weapon} from "./Equipment.ts";
-import {randomProbability} from "../util/ProbabilityUtils.ts";
+import {randomProbability, randomUtil, uuid} from "../util/ProbabilityUtils.ts";
 import {SaveFunction} from "../util/SaveUtils.ts";
+import BaseSkill, {Buff} from "./BaseSkill.ts";
 
 const temp: string[] = []
 const jj = [
@@ -94,11 +95,16 @@ export interface ImmortalCultivatorsInterface {
     necklace?: Necklace;
     // 坐骑
     mount?: Mount;
-
+    // 技能
+    skills?: BaseSkill[];
+    // 增益
+    gain?: Buff[];
+    // 负益
+    negativeBenefits?: Buff[];
 }
 
 
-function getEquipmentValue(immortal: ImmortalCultivators, prop: 'physique' | 'soulForce' | 'strength' | 'toughness' | 'erupt' | 'blast' | 'hit' | 'avoid' | 'attack' | 'life' | 'mana'|'backpackCapacity'): number {
+function getEquipmentValue(immortal: ImmortalCultivators, prop: 'physique' | 'soulForce' | 'strength' | 'toughness' | 'erupt' | 'blast' | 'hit' | 'avoid' | 'attack' | 'life' | 'mana' | 'backpackCapacity'): number {
     let equipmentValue = 0;
     const strings = [
         "weapon",
@@ -118,6 +124,21 @@ function getEquipmentValue(immortal: ImmortalCultivators, prop: 'physique' | 'so
         }
     }
     return equipmentValue;
+}
+
+function getBuffValue(immortal: ImmortalCultivators, prop: 'physique' | 'soulForce' | 'strength' | 'toughness' | 'erupt' | 'blast' | 'hit' | 'avoid' | 'attack' | 'life' | 'mana' | 'backpackCapacity'): number {
+    let buffValue = 0;
+    immortal.gain.filter(item => item.type === prop).forEach(item => {
+        buffValue += item.value;
+    })
+    immortal.negativeBenefits.filter(item => item.type === prop).forEach(item => {
+        buffValue -= item.value;
+    })
+    return buffValue;
+}
+
+function getOtherValue(immortal: ImmortalCultivators, prop: 'physique' | 'soulForce' | 'strength' | 'toughness' | 'erupt' | 'blast' | 'hit' | 'avoid' | 'attack' | 'life' | 'mana' | 'backpackCapacity'): number {
+    return getEquipmentValue(immortal, prop) + getBuffValue(immortal, prop)
 }
 
 export class ImmortalCultivators implements ImmortalCultivatorsInterface, SaveFunction<ImmortalCultivators> {
@@ -183,6 +204,62 @@ export class ImmortalCultivators implements ImmortalCultivatorsInterface, SaveFu
     necklace?: Necklace;
     // 坐骑
     mount?: Mount;
+    // 技能
+    skills?: BaseSkill[] = [];
+    // 增益
+    gain: Buff[] = [];
+    // 负益
+    negativeBenefits: Buff[] = [];
+
+    addGain(buff: Buff) {
+        // type一致，value一致，name一致，认为是同一个buff叠加时间即可
+        const buffs = this.gain.filter(item => item.type + item.name + item.value === buff.type + buff.name + buff.value);
+        if (buffs.length > 0) {
+            buffs[0].remainingTimes += buff.remainingTimes;
+            return
+        }
+        this.gain.push(buff)
+    }
+
+    addNegativeBenefits(buff: Buff) {
+        // type一致，value一致，name一致，认为是同一个buff叠加时间即可
+        const buffs = this.negativeBenefits.filter(item => item.type + item.name + item.value === buff.type + buff.name + buff.value);
+        if (buffs.length > 0) {
+            buffs[0].remainingTimes += buff.remainingTimes;
+            return
+        }
+        this.negativeBenefits.push(buff)
+    }
+
+    /**
+     * 回合结束
+     * 1、清理增益和减益
+     */
+    endRoud() {
+        // 清理buff信息
+        [...this.gain, ...this.negativeBenefits].forEach(item => item.remainingTimes--)
+        this.gain = this.gain.filter(item => item.remainingTimes > 0)
+        this.negativeBenefits = this.negativeBenefits.filter(item => item.remainingTimes > 0)
+    }
+
+    /**
+     * 获取可以执行的技能
+     */
+    getCanUseSkills(): BaseSkill[] {
+        return (this.skills || []).filter(item => (item.spendMana || 0) <= this.currentMana)
+    }
+
+    /**
+     * 使用技能的策略
+     */
+    skillSelectStrategy(): BaseSkill | undefined {
+        const canUseSkills = this.getCanUseSkills();
+        if (canUseSkills.length > 0) {
+            // 随机选择
+            return randomUtil.pickone([undefined, ...canUseSkills]);
+        }
+        return undefined;
+    }
 
     /**
      * 是否超重
@@ -191,8 +268,8 @@ export class ImmortalCultivators implements ImmortalCultivatorsInterface, SaveFu
         return this.baseEquipment.length >= this.getBackpackCapacity();
     }
 
-    getBackpackCapacity():number{
-        return this.backpackCapacity+ getEquipmentValue(this, 'backpackCapacity');
+    getBackpackCapacity(): number {
+        return this.backpackCapacity + getOtherValue(this, 'backpackCapacity');
     }
 
 
@@ -200,21 +277,21 @@ export class ImmortalCultivators implements ImmortalCultivatorsInterface, SaveFu
      * 获取暴击伤害
      */
     getCriticalDamage(): number {
-        return this.blast + getEquipmentValue(this, 'blast');
+        return this.blast + getOtherValue(this, 'blast');
     }
 
     /**
      * 获取命中率
      */
     getHit(): number {
-        return this.hit + getEquipmentValue(this, 'hit');
+        return this.hit + getOtherValue(this, 'hit');
     }
 
     /**
      * 获取躲避率
      */
     getAvoid(): number {
-        return this.avoid + getEquipmentValue(this, 'avoid');
+        return this.avoid + getOtherValue(this, 'avoid');
     }
 
     /**
@@ -222,7 +299,7 @@ export class ImmortalCultivators implements ImmortalCultivatorsInterface, SaveFu
      * 爆发=暴击率
      */
     getCriticalHitProbability(): number {
-        return this.erupt + getEquipmentValue(this, 'erupt');
+        return this.erupt + getOtherValue(this, 'erupt');
     }
 
     /**
@@ -241,7 +318,8 @@ export class ImmortalCultivators implements ImmortalCultivatorsInterface, SaveFu
         if (target.getAvoid() <= 0) {
             return true;
         }
-        const b = randomProbability(this.getHit() + target.avoidCount, number);
+        // 这里+10 为了增加命中概率而已
+        const b = randomProbability(this.getHit() + target.avoidCount + 10, number);
         if (b) {
             return true;
         } else {
@@ -254,19 +332,19 @@ export class ImmortalCultivators implements ImmortalCultivatorsInterface, SaveFu
      * 获取防御力
      */
     getDefense(): number {
-        return this.toughness + getEquipmentValue(this, 'toughness');
+        return this.toughness + getOtherValue(this, 'toughness');
     }
 
     getAttack(): number {
-        return this.strength + getEquipmentValue(this, 'strength') + getEquipmentValue(this, 'attack');
+        return this.strength + getOtherValue(this, 'strength') + getOtherValue(this, 'attack');
     }
 
     getMana(): number {
-        return this.soulForce + getEquipmentValue(this, 'soulForce') + getEquipmentValue(this, 'mana');
+        return this.soulForce + getOtherValue(this, 'soulForce') + getOtherValue(this, 'mana');
     }
 
     getLife(): number {
-        return this.physique + getEquipmentValue(this, 'physique') + getEquipmentValue(this, 'life');
+        return this.physique + getOtherValue(this, 'physique') + getOtherValue(this, 'life');
     }
 
 

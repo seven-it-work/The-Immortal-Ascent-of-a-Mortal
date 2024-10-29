@@ -35,7 +35,7 @@ export default defineComponent({
     </template>
     <div>
       <div class="progress-container">
-<!--                <span>{{immortalCultivator.currentLife}}/{{immortalCultivator.getLife()}}</span>-->
+        <!--                <span>{{immortalCultivator.currentLife}}/{{immortalCultivator.getLife()}}</span>-->
         <a-progress
             :stroke-color="{from: '#108ee9',to: '#87d068',}"
             :percent="getPercent(immortalCultivator.currentLife,immortalCultivator.getLife())"
@@ -53,9 +53,28 @@ export default defineComponent({
             :format="(percent)=>progressFormat(percent,'法力')"
         />
       </div>
-      <div class="progress-container">
-        <span>攻击：{{immortalCultivator.getAttack()}}</span>
-      </div>
+      <template v-if="immortalCultivator.gain.length">
+          <a-tooltip v-for="item in immortalCultivator.gain" :key="item.id" >
+            <template #title>{{item.name}}+{{item.value}}(持续{{item.remainingTimes}}回合)</template>
+            <a-badge :offset="[0,35]" :count="'+'+item.value"  style="margin-left: 10px;margin-bottom: 20px;">
+              <a-badge :count="item.remainingTimes">
+                <a-avatar shape="square" >{{item.name}}</a-avatar>
+              </a-badge>
+            </a-badge>
+          </a-tooltip>
+      </template>
+      <a-divider style="border-color: #7cb305" dashed />
+      <template v-if="immortalCultivator.negativeBenefits.length">
+          <a-tooltip v-for="item in immortalCultivator.negativeBenefits" :key="item.id" >
+            <template #title>{{item.name}}{{item.value}}(持续{{item.remainingTimes}}回合)</template>
+            <a-badge :offset="[0,35]" :count="item.value"  style="margin-left: 10px;margin-bottom: 20px;">
+              <a-badge :count="item.remainingTimes">
+                <a-avatar shape="square" >{{item.name}}</a-avatar>
+              </a-badge>
+            </a-badge>
+          </a-tooltip>
+      </template>
+
     </div>
   </a-card>
 </template>
