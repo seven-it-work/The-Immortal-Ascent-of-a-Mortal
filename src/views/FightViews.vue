@@ -4,7 +4,7 @@ import EquipmentCom from "../components/EquipmentCom.vue";
 import {useFightStore} from "../store/useFightStore.ts";
 import {Fight} from "../objs/Fight.ts";
 import {beAttacked, doAttacked} from "../util/AnimateUtils.ts";
-import {getPercent, randomUtil} from "../util/ProbabilityUtils.ts";
+import {getPercent, randomUtil, uuid} from "../util/ProbabilityUtils.ts";
 import {getLevelStr, ImmortalCultivators} from "../objs/ImmortalCultivators.ts";
 import {message, Modal} from 'ant-design-vue';
 import {useLogStore} from "../store/useLogStore.ts";
@@ -14,6 +14,7 @@ import {progressFormat, textEllipsis} from "../util/StrUtils.ts";
 import {one_classify} from "../objs/Equipment.ts";
 import EquipmentPopoverItem from "../components/equipment/EquipmentPopoverItem.vue";
 import EquipmentCompare from "../components/equipment/EquipmentCompare.vue";
+import BaseSkill, {PropertySkill} from "../objs/BaseSkill.ts";
 
 const fightStore = useFightStore()
 const logStore = useLogStore()
@@ -89,6 +90,7 @@ async function fightFunction(attacker: ImmortalCultivators, defencer: ImmortalCu
   // 技能执行判断
   const skillSelectStrategy = attacker.skillSelectStrategy();
   if (skillSelectStrategy) {
+    console.log("使用技能", skillSelectStrategy)
     // 使用技能
     harm = skillSelectStrategy.doUseSkill(attacker, defencer, attackTeam, defenderTeam).harm;
   } else {

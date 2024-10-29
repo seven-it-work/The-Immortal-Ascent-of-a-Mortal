@@ -3,7 +3,8 @@ import {randomUsePoint} from "../util/RandomCreateUtils.ts";
 import {BaseEquipment, Belt, Bottle, Clothe, Mount, Necklace, Ring, Shoe, Weapon} from "./Equipment.ts";
 import {randomProbability, randomUtil, uuid} from "../util/ProbabilityUtils.ts";
 import {SaveFunction} from "../util/SaveUtils.ts";
-import BaseSkill, {Buff} from "./BaseSkill.ts";
+import BaseSkill, {Buff, json2SkillUtil} from "./BaseSkill.ts";
+import skillData from "./data/skillData.ts";
 
 const temp: string[] = []
 const jj = [
@@ -205,7 +206,7 @@ export class ImmortalCultivators implements ImmortalCultivatorsInterface, SaveFu
     // 坐骑
     mount?: Mount;
     // 技能
-    skills?: BaseSkill[] = [];
+    skills: BaseSkill[] = [];
     // 增益
     gain: Buff[] = [];
     // 负益
@@ -213,7 +214,7 @@ export class ImmortalCultivators implements ImmortalCultivatorsInterface, SaveFu
 
     addGain(buff: Buff) {
         // type一致，value一致，name一致，认为是同一个buff叠加时间即可
-        const buffs = this.gain.filter(item => item.type + item.name + item.value === buff.type + buff.name + buff.value);
+        const buffs = this.gain.filter(item => item.type + item.name + item.value === buff.type + buff.name + buff.value || item.id === buff.id);
         if (buffs.length > 0) {
             buffs[0].remainingTimes += buff.remainingTimes;
             return
@@ -223,7 +224,7 @@ export class ImmortalCultivators implements ImmortalCultivatorsInterface, SaveFu
 
     addNegativeBenefits(buff: Buff) {
         // type一致，value一致，name一致，认为是同一个buff叠加时间即可
-        const buffs = this.negativeBenefits.filter(item => item.type + item.name + item.value === buff.type + buff.name + buff.value);
+        const buffs = this.negativeBenefits.filter(item => item.type + item.name + item.value === buff.type + buff.name + buff.value || item.id === buff.id);
         if (buffs.length > 0) {
             buffs[0].remainingTimes += buff.remainingTimes;
             return
@@ -254,9 +255,11 @@ export class ImmortalCultivators implements ImmortalCultivatorsInterface, SaveFu
      */
     skillSelectStrategy(): BaseSkill | undefined {
         const canUseSkills = this.getCanUseSkills();
+        console.log(this.currentMana, this.skills, canUseSkills)
         if (canUseSkills.length > 0) {
             // 随机选择
-            return randomUtil.pickone([undefined, ...canUseSkills]);
+            // return randomUtil.pickone([undefined, ...canUseSkills]);
+            return randomUtil.pickone([...canUseSkills]);
         }
         return undefined;
     }
@@ -358,6 +361,7 @@ export class ImmortalCultivators implements ImmortalCultivatorsInterface, SaveFu
 
     constructor(immortalCultivatorsInterface?: ImmortalCultivatorsInterface) {
         Object.assign(this, immortalCultivatorsInterface)
+        this.skills.push(json2SkillUtil(skillData.filter(item => item.id === 'attackerPhysiqueAdd1And10')[0]))
     }
 
     /**

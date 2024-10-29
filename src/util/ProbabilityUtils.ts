@@ -6,6 +6,17 @@ export const randomUtil = new Chance()
 export const uuid = () => randomUtil.guid()
 
 
+export const pickList = (list: T[], size: number = 1): T[] => {
+    if (list.length <= 0) {
+        return []
+    }
+    if (size === 1 || list.length === 1) {
+        return [randomUtil.pickOne(list)]
+    } else {
+        return randomUtil.pick(list, size)
+    }
+}
+
 /**
  * 概率工具
  * @param num 越大概率越大
